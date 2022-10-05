@@ -1,21 +1,20 @@
-import * as THREE from 'three';
-import {System} from 'ecsy';
-import {TextMesh} from 'troika-3d-text/dist/textmesh-standalone.esm.js';
-import {Object3D, Text} from '../components/index.js';
+import * as THREE from "three";
+import { System } from "ecsy";
+import { Text as TextMesh } from "troika-three-text";
+import { Object3D, Text } from "../components/index.js";
 
 const anchorMapping = {
-  'left': 0,
-  'center': 0.5,
-  'right': 1
-}
+  left: 0,
+  center: 0.5,
+  right: 1,
+};
 const baselineMapping = {
-  'top': 0,
-  'center': 0.5,
-  'bottom': 1
-}
+  top: 0,
+  center: 0.5,
+  bottom: 1,
+};
 
 export class SDFTextSystem extends System {
-
   updateText(textMesh, textComponent) {
     textMesh.text = textComponent.text;
     textMesh.textAlign = textComponent.textAlign;
@@ -36,25 +35,25 @@ export class SDFTextSystem extends System {
   execute(delta, time) {
     var entities = this.queries.entities;
 
-    entities.added.forEach(e => {
+    entities.added.forEach((e) => {
       var textComponent = e.getComponent(Text);
 
       const textMesh = new TextMesh();
-      textMesh.name = 'textMesh';
+      textMesh.name = "textMesh";
       textMesh.anchor = [0, 0];
       textMesh.renderOrder = 1; //brute-force fix for ugly antialiasing, see issue #67
       this.updateText(textMesh, textComponent);
-      e.addComponent(Object3D, {value: textMesh});
+      e.addComponent(Object3D, { value: textMesh });
     });
 
-    entities.removed.forEach(e => {
+    entities.removed.forEach((e) => {
       var object3D = e.getComponent(Object3D).value;
-      var textMesh = object3D.getObjectByName('textMesh');
+      var textMesh = object3D.getObjectByName("textMesh");
       textMesh.dispose();
       object3D.remove(textMesh);
     });
 
-    entities.changed.forEach(e => {
+    entities.changed.forEach((e) => {
       var object3D = e.getComponent(Object3D).value;
       if (object3D instanceof TextMesh) {
         var textComponent = e.getComponent(Text);
@@ -70,7 +69,7 @@ SDFTextSystem.queries = {
     listen: {
       added: true,
       removed: true,
-      changed: [Text]
-    }
-  }
-}
+      changed: [Text],
+    },
+  },
+};
