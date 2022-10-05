@@ -1,63 +1,113 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="apple-touch-icon-precomposed" sizes="57x57" href="./res/apple-touch-icon-57x57.png" />
-    <link rel="apple-touch-icon-precomposed" sizes="114x114" href="./res/apple-touch-icon-114x114.png" />
-    <link rel="apple-touch-icon-precomposed" sizes="72x72" href="./res/apple-touch-icon-72x72.png" />
-    <link rel="apple-touch-icon-precomposed" sizes="144x144" href="./res/apple-touch-icon-144x144.png" />
-    <link rel="apple-touch-icon-precomposed" sizes="120x120" href="./res/apple-touch-icon-120x120.png" />
-    <link rel="apple-touch-icon-precomposed" sizes="152x152" href="./res/apple-touch-icon-152x152.png" />
-    <link rel="icon" type="image/png" href="./res/favicon-32x32.png" sizes="32x32" />
-    <link rel="icon" type="image/png" href="./res/favicon-16x16.png" sizes="16x16" />
-    <meta name="application-name" content="WebXR - a11y — tmn.dev"/>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link
+      rel="apple-touch-icon-precomposed"
+      sizes="57x57"
+      href="./res/apple-touch-icon-57x57.png"
+    />
+    <link
+      rel="apple-touch-icon-precomposed"
+      sizes="114x114"
+      href="./res/apple-touch-icon-114x114.png"
+    />
+    <link
+      rel="apple-touch-icon-precomposed"
+      sizes="72x72"
+      href="./res/apple-touch-icon-72x72.png"
+    />
+    <link
+      rel="apple-touch-icon-precomposed"
+      sizes="144x144"
+      href="./res/apple-touch-icon-144x144.png"
+    />
+    <link
+      rel="apple-touch-icon-precomposed"
+      sizes="120x120"
+      href="./res/apple-touch-icon-120x120.png"
+    />
+    <link
+      rel="apple-touch-icon-precomposed"
+      sizes="152x152"
+      href="./res/apple-touch-icon-152x152.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      href="./res/favicon-32x32.png"
+      sizes="32x32"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      href="./res/favicon-16x16.png"
+      sizes="16x16"
+    />
+    <meta name="application-name" content="WebXR - a11y — tmn.dev" />
     <meta name="msapplication-TileColor" content="#C6C6C6" />
     <meta name="msapplication-TileImage" content="./res/mstile-144x144.png" />
 
     <!-- Search Engine -->
-    <meta name="description" content="Accessibility Demonstration of WebXR multi-experience forked from the Mozilla Mixed Reality team.">
-    <meta name="image" content="./assets/big_thumbnail.jpg">
+    <meta
+      name="description"
+      content="Accessibility Demonstration of WebXR multi-experience forked from the Mozilla Mixed Reality team."
+    />
+    <meta name="image" content="./res/big_thumbnail.jpg" />
     <!-- Schema.org for Google -->
-    <meta itemprop="name" content="WebXR - a11y — tmn.dev">
-    <meta itemprop="description" content="Accessibility Demonstration of WebXR multi-experience forked from the Mozilla Mixed Reality team.">
-    <meta itemprop="image" content="./assets/big_thumbnail.jpg">
+    <meta itemprop="name" content="WebXR - a11y — tmn.dev" />
+    <meta
+      itemprop="description"
+      content="Accessibility Demonstration of WebXR multi-experience forked from the Mozilla Mixed Reality team."
+    />
+    <meta itemprop="image" content="./res/big_thumbnail.jpg" />
     <!-- Twitter -->
-    <meta name="twitter:card" content="summary">
-    <meta name="twitter:title" content="WebXR - a11y — tmn.dev">
-    <meta name="twitter:description" content="Accessibility Demonstration of WebXR multi-experience forked from the Mozilla Mixed Reality team. https://webxr-a11y.tmn.dev">
-    <meta name="twitter:site" content="@TimonLinke">
-    <meta name="twitter:creator" content="@TimonLinke">
-    <meta name="twitter:image:src" content="./assets/big_thumbnail.jpg">
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="WebXR - a11y — tmn.dev" />
+    <meta
+      name="twitter:description"
+      content="Accessibility Demonstration of WebXR multi-experience forked from the Mozilla Mixed Reality team. https://webxr-a11y.tmn.dev"
+    />
+    <meta name="twitter:site" content="@TimonLinke" />
+    <meta name="twitter:creator" content="@TimonLinke" />
+    <meta name="twitter:image:src" content="./res/big_thumbnail.jpg" />
     <!-- Open Graph general (Facebook, Pinterest & Google+) -->
-    <meta name="og:title" content="WebXR - a11y — tmn.dev">
-    <meta name="og:description" content="Accessibility Demonstration of WebXR multi-experience forked from the Mozilla Mixed Reality team.">
-    <meta name="og:image" content="./assets/big_thumbnail.jpg">
-    <meta name="og:url" content="https://webxr-a11y.tmn.dev">
-    <meta name="og:site_name" content="WebXR - a11y — tmn.dev">
-    <meta name="og:locale" content="en_US">
-    <meta name="og:type" content="website">
+    <meta name="og:title" content="WebXR - a11y — tmn.dev" />
+    <meta
+      name="og:description"
+      content="Accessibility Demonstration of WebXR multi-experience forked from the Mozilla Mixed Reality team."
+    />
+    <meta name="og:image" content="./res/big_thumbnail.jpg" />
+    <meta name="og:url" content="https://webxr-a11y.tmn.dev" />
+    <meta name="og:site_name" content="WebXR - a11y — tmn.dev" />
+    <meta name="og:locale" content="en_US" />
+    <meta name="og:type" content="website" />
 
     <title>WebXR - a11y — tmn.dev</title>
 
     <style>
-      @font-face{
-          font-family: 'Roboto Slab';
-          src: url('https://static.tmn.dev/fonts/roboto-slab-600.woff');
-          src: url('https://static.tmn.dev/fonts/roboto-slab-600woff2') format('woff2'),
-              url('https://static.tmn.dev/fonts/roboto-slab-600.woff') format('woff'),
-              url('https://static.tmn.dev/fonts/roboto-slab-600.otf') format('opentype'),
-              url('https://static.tmn.dev/fonts/roboto-slab-600.ttf') format('truetype');
-          font-weight: 600;
-          font-style: normal;
+      @font-face {
+        font-family: "Roboto Slab";
+        src: url("https://static.tmn.dev/fonts/roboto-slab-600.woff");
+        src: url("https://static.tmn.dev/fonts/roboto-slab-600woff2")
+            format("woff2"),
+          url("https://static.tmn.dev/fonts/roboto-slab-600.woff")
+            format("woff"),
+          url("https://static.tmn.dev/fonts/roboto-slab-600.otf")
+            format("opentype"),
+          url("https://static.tmn.dev/fonts/roboto-slab-600.ttf")
+            format("truetype");
+        font-weight: 600;
+        font-style: normal;
       }
 
-      body{
+      body {
         margin: 0;
         overflow: hidden;
-        font-family: 'Roboto Slab', sans-serif;
+        font-family: "Roboto Slab", sans-serif;
       }
-      
+
       header {
         position: absolute;
         width: calc(100vw - 1rem);
@@ -72,28 +122,28 @@
         margin-bottom: 1rem;
         text-align: right;
       }
-      
+
       header a {
         text-decoration: none;
         color: #000;
         margin-left: 0.8rem;
         vertical-align: top;
       }
-      
-      header a path{
+
+      header a path {
         fill: #000;
       }
-      
+
       header a:hover {
         color: #059;
         text-decoration: underline;
         text-underline-offset: 6px;
       }
-      
+
       #handedness a {
         margin-left: 0.3rem;
       }
-      
+
       .activehand {
         background: #000;
         color: #fff;
@@ -112,7 +162,7 @@
         background-size: cover;
         background-position: center;
       }
-      
+
       #loading h1 {
         color: white;
         font-size: 6rem;
@@ -140,9 +190,8 @@
       #no-webxr a {
         color: #000;
       }
-
     </style>
-    <script defer src="bundle.js"></script>
+    <script defer type="module" src="./src/index.js"></script>
     <script type="text/javascript">
       function aclick(ev) {
         ev.stopPropagation();
@@ -150,7 +199,7 @@
 
       function setHandedness(link, hand) {
         var currentURL = new URL(window.location);
-        currentURL.searchParams.set('handedness', hand);
+        currentURL.searchParams.set("handedness", hand);
         link.href = currentURL.href;
       }
     </script>
@@ -159,20 +208,37 @@
     <div id="loading">
       <div>
         <h1>Hello! Currently loading Assets and Data</h1>
-        <svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" version="1.1">
-          <path stroke="#000" stroke-width="8px" fill="none" d="M 50 5 a 45 45 0 1 0 0.0001 0"
-          stroke-dasharray="282 282" stroke-dashoffset="282" id="progressbar"/>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="100"
+          height="100"
+          version="1.1"
+        >
+          <path
+            stroke="#000"
+            stroke-width="8px"
+            fill="none"
+            d="M 50 5 a 45 45 0 1 0 0.0001 0"
+            stroke-dasharray="282 282"
+            stroke-dashoffset="282"
+            id="progressbar"
+          />
         </svg>
       </div>
     </div>
     <div id="no-webxr" class="hidden">
-      WEBXR NOT AVAILABLE. PLEASE USE A VR HEADSET (<a href="https://www.youtube.com/watch?v=uXBDogyGXTQ">watch preview video</a>)
+      WEBXR NOT AVAILABLE. PLEASE USE A VR HEADSET (<a
+        href="https://www.youtube.com/watch?v=uXBDogyGXTQ"
+        >watch preview video</a
+      >)
     </div>
     <header>
       <span id="handedness">
         Handedness:
         <a href="#" id="lefthand" onclick="setHandedness(this, 'left')">Left</a>
-        <a href="#" id="righthand" onclick="setHandedness(this, 'right')">Right</a>
+        <a href="#" id="righthand" onclick="setHandedness(this, 'right')"
+          >Right</a
+        >
       </span>
     </header>
     <footer></footer>
