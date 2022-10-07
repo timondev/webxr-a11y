@@ -1,0 +1,9 @@
+{
+  "/assets": {
+    "target": "https://static.tmn.dev/",
+    "changeOrigin": true,
+    "pathRewrite": {
+      "^/assets": "/assets/webxr-a11y/"
+    }
+  }
+}
