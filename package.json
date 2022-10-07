@@ -4,9 +4,9 @@
   "description": "Accessibility Demonstration of different WebXR experiences and interaction examples",
   "private": true,
   "scripts": {
-    "start": "npx webpack serve",
-    "build": "webpack -p",
-    "watch": "webpack --watch"
+    "start": "parcel -p 80 index.html",
+    "build": "parcel build index.html",
+    "watch": "parcel watch index.html"
   },
   "repository": {
     "type": "git",
@@ -40,7 +40,7 @@
   "devDependencies": {
     "@babel/core": "^7.6.4",
     "babel-loader": "^8.0.6",
-    "parcel": "^2.7.0",
+    "parcel": "^2.0.0-nightly.1170",
     "process": "^0.11.10"
   }
 }
