@@ -1,6 +1,14 @@
-import * as THREE from 'three';
-import {System} from 'ecsy';
-import {Area, AreaInside, AreaExiting, AreaEntering, Object3D, AreaChecker, BoundingBox} from '../components/index.js';
+import * as THREE from "three";
+import { System } from "ecsy";
+import {
+  Area,
+  AreaInside,
+  AreaExiting,
+  AreaEntering,
+  Object3D,
+  AreaChecker,
+  BoundingBox,
+} from "../components.js";
 
 export class AreaCheckerSystem extends System {
   execute(delta, time) {
@@ -29,6 +37,6 @@ AreaCheckerSystem.queries = {
     components: [Area, BoundingBox],
   },
   checkers: {
-    components: [AreaChecker, Object3D]
-  }
-}
+    components: [AreaChecker, Object3D],
+  },
+};

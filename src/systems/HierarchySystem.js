@@ -1,24 +1,24 @@
-import * as THREE from 'three';
-import {System} from 'ecsy';
-import {Object3D, ParentObject3D} from '../components/index.js';
+import * as THREE from "three";
+import { System } from "ecsy";
+import { Object3D, ParentObject3D } from "../components.js";
 
 export default class HierarchySystem extends System {
   execute(delta, time) {
-    this.queries.entities.added.forEach(entity => {
+    this.queries.entities.added.forEach((entity) => {
       const parent = entity.getComponent(ParentObject3D).value;
       const object = entity.getComponent(Object3D).value;
 
       parent.add(object);
     });
 
-    this.queries.entities.changed.forEach(entity => {
+    this.queries.entities.changed.forEach((entity) => {
       const parent = entity.getComponent(ParentObject3D).value;
       const object = entity.getComponent(Object3D).value;
 
       parent.add(object);
     });
 
-    this.queries.entities.removed.forEach(entity => {
+    this.queries.entities.removed.forEach((entity) => {
       const parent = entity.getComponent(ParentObject3D, true).value;
       parent.remove(entity.getComponent(Object3D, true).value);
     });
@@ -31,7 +31,7 @@ HierarchySystem.queries = {
     listen: {
       added: true,
       removed: true,
-      changed: true // [Component]
-    }
-  }
-}
+      changed: true, // [Component]
+    },
+  },
+};

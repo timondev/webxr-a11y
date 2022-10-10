@@ -38,7 +38,7 @@ import {
   Billboard,
   Children,
   Opacity,
-} from "./components/index.js";
+} from "./components.js";
 
 import RayControl from "./lib/RayControl.js";
 import Teleport from "./lib/Teleport.js";

@@ -3,7 +3,7 @@ import {
   DebugHelper,
   DebugHelperMesh,
   BoundingBox,
-} from "../components/index.js";
+} from "../components.js";
 import { System, Not } from "ecsy";
 import * as THREE from "three";
 
