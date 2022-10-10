@@ -37,8 +37,6 @@
     "webxr-polyfill": "^2.0.1"
   },
   "devDependencies": {
-    "@babel/core": "^7.6.4",
-    "babel-loader": "^8.0.6",
     "parcel": "^2.0.0-nightly.1170",
     "parcel-reporter-static-files-copy": "^1.4.0",
     "process": "^0.11.10"
