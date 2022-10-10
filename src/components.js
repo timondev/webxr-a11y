@@ -1,5 +1,6 @@
 import * as THREE from "three";
 import { TagComponent, Component, SystemStateComponent, Types } from "ecsy";
+import { VectorComponent } from "./lib/VectorComponent";
 
 class Object3D extends Component {
   constructor() {
@@ -16,31 +17,17 @@ Object3D.schema = {
   value: { type: Types.Ref },
 };
 
-class Rotation extends Component {
+class Rotation extends VectorComponent {
   constructor() {
     super();
-    this.rotation = new THREE.Vector3();
   }
-
-  reset() {}
 }
 
-Rotation.schema = {
-  rotation: { type: Types.Ref },
-};
-
-class Position extends Component {
+class Position extends VectorComponent {
   constructor() {
     super();
-    this.position = new THREE.Vector3();
   }
-
-  reset() {}
 }
-
-Position.schema = {
-  position: { type: Types.Ref },
-};
 
 class ParentObject3D extends Component {
   constructor() {
@@ -62,7 +49,7 @@ class Text extends Component {
     super();
     this.text = "";
     this.textAlign = "left"; // ['left', 'right', 'center']
-    this.anchorX = "center"; // ['left', 'right', 'center', 'align']
+    this.anchor = "center"; // ['left', 'right', 'center', 'align']
     this.baseline = "center"; // ['top', 'center', 'bottom']
     this.color = "#FFF";
     this.font = "https://code.cdn.mozilla.net/fonts/ttf/ZillaSlab-SemiBold.ttf";
@@ -83,7 +70,7 @@ class Text extends Component {
 Text.schema = {
   text: { type: Types.String },
   textAlign: { type: Types.String },
-  anchorX: { type: Types.String },
+  anchor: { type: Types.String },
   baseline: { type: Types.String },
   color: { type: Types.String },
   font: { type: Types.String },
