@@ -118,7 +118,6 @@ function refreshZoomUV(hit) {
   zoom.widget.position.copy(hit.point);
   zoom.widget.position.x -= 0.5 * zoom.animation;
 
-  const uvs = zoom.widget.geometry.faceVertexUvs[0];
   zoom.widget.material.uniforms.zoomPos.value.copy(hit.uv);
   zoom.widget.material.uniforms.zoomAmount.value = ZOOMS[hit.object.userData.paintingId];
 }

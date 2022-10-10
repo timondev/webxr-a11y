@@ -23,9 +23,9 @@ export class AreaCheckerSystem extends System {
         const checker = checkers[j];
         const obj3D = checker.getComponent(Object3D).value;
         if (obj3D.boundingBox.intersectsBox(bboxArea)) {
-          checker.addComponent(AreaInside);
+          if(!checker.hasComponent(AreaInside)) checker.addComponent(AreaInside);
         } else {
-          checker.removeComponent(AreaInside);
+          if(checker.hasComponent(AreaInside)) checker.removeComponent(AreaInside);
         }
       }
     }
