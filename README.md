@@ -14,7 +14,7 @@
 <br />
 <div align="center">
   <a href="https://github.com/timondev/webxr-a11y">
-    <img src="res/favicon.png" alt="WebXR - a11y Logo; M-Symbol in different shades of pink to orange" width="80" height="80">
+    <img src="static/res/favicon.png" alt="WebXR - a11y Logo; M-Symbol in different shades of pink to orange" width="80" height="80">
   </a>
 
 <h3 align="center">WebXR - a11y</h3>
