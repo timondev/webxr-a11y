@@ -6,8 +6,8 @@ import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader.js";
 import { FontLoader } from "three/examples/jsm/loaders/FontLoader";
 
 //const BASIS_LIB_PATH = 'src/vendor/';
-const BASIS_LIB_PATH = "src/vendor/";
-const DRACO_LIB_PATH = "src/vendor/";
+const BASIS_LIB_PATH = "vendor/";
+const DRACO_LIB_PATH = "vendor/";
 
 function getLoadedCount(assets) {
   let count = 0;
