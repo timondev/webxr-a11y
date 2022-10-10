@@ -80,7 +80,7 @@ This project is forked from [MozillaReality/hello-webxr](https://github.com/Mozi
 [![WebGL][WebGL.com]][WebGL-url]
 [![Three.js][Three.js.com]][Three.js-url]
 [![Node.js][Node.js.com]][Node.js-url]
-[![Webpack][Webpack.com]][Webpack-url]
+[![Parcel][Parcel.com]][Parcel-url]
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -134,7 +134,7 @@ To run this project you need a WebXR capable device and browser. Firefox and Chr
 3. Run the software, it may take some time to build
    
    ```sh
-   npx webpack serve
+   npm start
    ```
 
 ---
@@ -261,8 +261,8 @@ Distributed under the Apache-2.0 License. See `LICENSE` for more information.
 [Three.js-url]: https://threejs.org/
 [Node.js.com]: https://img.shields.io/badge/node.js-0769AD?style=for-the-badge&logo=Node.js&color=green&logoColor=white
 [Node.js-url]: https://nodejs.org/
-[Webpack.com]: https://img.shields.io/badge/webpack-0769AD?style=for-the-badge&logo=Webpack&color=blue&logoColor=white
-[Webpack-url]: https://webpack.js.org/
+[Parcel.com]: https://img.shields.io/badge/parcel-0769AD?style=for-the-badge&logo=Parcel&color=blue&logoColor=white
+[Parcel-url]: https://parceljs.org/
 
 <!-- COMPATIBILITY SCORE -->
 [IE]: https://img.shields.io/badge/ie-0769AD?style=for-the-badge&logo=Internet%20Explorer&color=red&logoColor=white
