@@ -212,7 +212,7 @@ export function setup(ctx, hall) {
         drawContext.strokeStyle = "#0f0";
         var dist = lastPosition.distanceTo(aux2);
         var angle = angleBetween(lastPosition, aux2);
-        let alpha = THREE.Math.clamp(1 - distance, 0, 1);
+        let alpha = THREE.MathUtils.clamp(1 - distance, 0, 1);
 
         drawContext.globalAlpha = alpha;
 
@@ -221,7 +221,7 @@ export function setup(ctx, hall) {
           var _y = lastPosition.y + Math.cos(angle) * i;
           drawContext.save();
           drawContext.translate(_x, _y);
-          let r = THREE.Math.lerp(0.001, 0.2, distance);
+          let r = THREE.MathUtils.lerp(0.001, 0.2, distance);
           drawContext.scale(r, r);
 
           drawContext.rotate((Math.PI * 180) / getRandomInt(0, 180));
