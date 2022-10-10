@@ -2,7 +2,7 @@
  * @private
  * @class EventDispatcher
  */
-export default class EventDispatcher {
+class EventDispatcher {
   constructor() {
     this._listeners = {};
     this.stats = {
@@ -45,9 +45,9 @@ export default class EventDispatcher {
    * @param {Function} listener Callback for the specified event
    */
   removeEventListener(eventName, listener) {
-    var listenerArray = this._listeners[eventName];
+    const listenerArray = this._listeners[eventName];
     if (listenerArray !== undefined) {
-      var index = listenerArray.indexOf(listener);
+      const index = listenerArray.indexOf(listener);
       if (index !== -1) {
         listenerArray.splice(index, 1);
       }
@@ -62,11 +62,11 @@ export default class EventDispatcher {
   dispatchEvent(eventName, data) {
     this.stats.fired++;
 
-    var listenerArray = this._listeners[eventName];
+    const listenerArray = this._listeners[eventName];
     if (listenerArray !== undefined) {
-      var array = listenerArray.slice(0);
+      const array = listenerArray.slice(0);
 
-      for (var i = 0; i < array.length; i++) {
+      for (let i = 0; i < array.length; i++) {
         array[i].call(this, data);
       }
     }
@@ -79,3 +79,5 @@ export default class EventDispatcher {
     this.stats.fired = this.stats.handled = 0;
   }
 }
+
+export { EventDispatcher };

@@ -1,4 +1,4 @@
-export var shaders = {
+const shaders = {
   door_frag: `
 uniform float time;
 uniform float selected;
@@ -133,3 +133,5 @@ void main( void ) {
 }
 `,
 };
+
+export { shaders };

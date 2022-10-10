@@ -9,9 +9,9 @@ import { FontLoader } from "three/examples/jsm/loaders/FontLoader";
 const BASIS_LIB_PATH = "vendor/";
 const DRACO_LIB_PATH = "vendor/";
 
-function getLoadedCount(assets) {
+const getLoadedCount = (assets) =>  {
   let count = 0;
-  for (var i in assets) {
+  for (let i in assets) {
     if (assets[i].loading !== true) {
       count++;
     }
@@ -19,8 +19,8 @@ function getLoadedCount(assets) {
   return count;
 }
 
-function allAssetsLoaded(assets) {
-  for (var i in assets) {
+const allAssetsLoaded = (assets) =>  {
+  for (let i in assets) {
     if (assets[i].loading === true) {
       return false;
     }
@@ -28,7 +28,7 @@ function allAssetsLoaded(assets) {
   return true;
 }
 
-export function loadAssets(
+function loadAssets(
   renderer,
   basePath,
   assets,
@@ -40,21 +40,21 @@ export function loadAssets(
     basePath += "/";
   }
 
-  var basisLoader = new BasisTextureLoader();
+  const basisLoader = new BasisTextureLoader();
   basisLoader.setTranscoderPath(BASIS_LIB_PATH);
   basisLoader.detectSupport(renderer);
 
-  var gltfLoader = new GLTFLoader();
-  var dracoLoader = new DRACOLoader();
+  const gltfLoader = new GLTFLoader();
+  const dracoLoader = new DRACOLoader();
   dracoLoader.setDecoderPath(DRACO_LIB_PATH);
   gltfLoader.setDRACOLoader(dracoLoader);
 
-  var texLoader = new THREE.TextureLoader();
-  var objLoader = new OBJLoader();
-  var fontLoader = new FontLoader();
-  var audioLoader = new THREE.AudioLoader();
+  const texLoader = new THREE.TextureLoader();
+  const objLoader = new OBJLoader();
+  const fontLoader = new FontLoader();
+  const audioLoader = new THREE.AudioLoader();
 
-  var loaders = {
+  const loaders = {
     gltf: gltfLoader,
     glb: gltfLoader,
     obj: objLoader,
@@ -66,7 +66,7 @@ export function loadAssets(
     ogg: audioLoader,
   };
 
-  for (var i in assets) {
+  for (let i in assets) {
     let assetId = i;
     let assetPath = assets[i].url;
     assets[i].loading = true;
@@ -77,7 +77,7 @@ export function loadAssets(
         if (debug) {
           console.info(`%c ${assetPath} loaded`, "color:green");
         }
-        var options = assets[assetId].options;
+        const options = assets[assetId].options;
         assets[assetId] = ext == "font" ? asset.data : asset;
 
         if (typeof options !== "undefined") {
@@ -107,3 +107,5 @@ export function loadAssets(
     );
   }
 }
+
+export { loadAssets };

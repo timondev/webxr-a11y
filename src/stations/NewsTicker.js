@@ -2,7 +2,7 @@
 import * as THREE from "three";
 import { Text, Rotation, Position, ParentObject3D } from "../components.js";
 
-var newsTicker = {
+const newsTicker = {
   url: "assets/tweets.json",
   hashtag: "#helloWebXR",
   hashtagText: null,
@@ -12,9 +12,9 @@ var newsTicker = {
   current: 0,
 };
 
-var screenMaterial;
+let screenMaterial;
 
-export function setup(ctx, hall) {
+const setup = (ctx, hall) =>  {
   const newsTickerMesh = hall.getObjectByName("newsticker");
 
   ctx.world.createEntity();
@@ -70,7 +70,7 @@ export function setup(ctx, hall) {
     });
 }
 
-function nextNews() {
+const nextNews = () =>  {
   const n = newsTicker;
   n.authorText.getMutableComponent(Text).text = n.news[n.current].author;
   n.messageText.getMutableComponent(Text).text = n.news[n.current].message;
@@ -78,7 +78,9 @@ function nextNews() {
   setTimeout(nextNews, 3000);
 }
 
-export function execute(ctx, delta, time) {
-  var v = 0.98 + Math.sin(time * 40) * 0.02;
+const execute = (ctx, delta, time) =>  {
+  const v = 0.98 + Math.sin(time * 40) * 0.02;
   screenMaterial.color.setRGB(v, v, v);
 }
+
+export { setup, execute };

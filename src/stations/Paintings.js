@@ -1,17 +1,17 @@
 import * as THREE from 'three';
 
-var paintings;
-var zoom = {object: null, widget: null, controller: null, animation: 0, icon: null};
+let paintings;
+const zoom = {object: null, widget: null, controller: null, animation: 0, icon: null};
 const PAINTINGS = ['seurat', 'sorolla', 'bosch', 'degas', 'rembrandt'];
 const RATIOS = [1, 1, 0.5, 0.5, 1];
 const ZOOMS = [0.4, 0.2, 0.2, 0.4, 0.25];
 
 
-export function enter(ctx) {
+const enter = (ctx) =>  {
   ctx.raycontrol.activateState('paintings');
 }
 
-export function setup(ctx, hall) {
+const setup = (ctx, hall) =>  {
   for (let i in PAINTINGS) {
     let painting = PAINTINGS[i];
     let mesh = hall.getObjectByName(painting);
@@ -102,7 +102,7 @@ export function setup(ctx, hall) {
   });
 }
 
-export function execute(ctx, delta, time) {
+const execute = (ctx, delta, time) =>  {
   if (zoom.painting) {
       if (zoom.animation < 1) {
         zoom.animation += (1 - zoom.animation) * delta * 4.0;
@@ -111,13 +111,12 @@ export function execute(ctx, delta, time) {
   }
 }
 
-var minUV = new THREE.Vector2();
-var maxUV = new THREE.Vector2();
-
-function refreshZoomUV(hit) {
+const refreshZoomUV = (hit) =>  {
   zoom.widget.position.copy(hit.point);
   zoom.widget.position.x -= 0.5 * zoom.animation;
 
   zoom.widget.material.uniforms.zoomPos.value.copy(hit.uv);
   zoom.widget.material.uniforms.zoomAmount.value = ZOOMS[hit.object.userData.paintingId];
 }
+
+export { setup, enter, execute };

@@ -1,13 +1,13 @@
 import * as THREE from 'three';
 
-export default class PositionalAudioPolyphonic extends THREE.Object3D {
+class PositionalAudioPolyphonic extends THREE.Object3D {
   constructor(listener, poolSize) {
     super();
     this.listener = listener;
     this.context = listener.context;
 
     this.poolSize = poolSize || 5;
-    for (var i = 0; i < this.poolSize; i++) {
+    for (let i = 0; i < this.poolSize; i++) {
       this.children.push(new THREE.PositionalAudio(listener));
     }
   }
@@ -19,7 +19,7 @@ export default class PositionalAudioPolyphonic extends THREE.Object3D {
   }
 
   play() {
-    var found = false;
+    let found = false;
     for (let i = 0;i<this.children.length; i++) {
       let sound = this.children[i];
       if (!sound.isPlaying && sound.buffer && !found) {
@@ -37,3 +37,5 @@ export default class PositionalAudioPolyphonic extends THREE.Object3D {
 
   }
 }
+
+export { PositionalAudioPolyphonic };

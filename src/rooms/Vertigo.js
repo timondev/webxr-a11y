@@ -1,7 +1,7 @@
 import * as THREE from 'three';
-var scene, doorMaterial, door;
+let scene, doorMaterial, door;
 
-function createDoorMaterial(ctx) {
+const createDoorMaterial = (ctx) =>  {
   return new THREE.ShaderMaterial({
     uniforms: {
       time: {value: 0},
@@ -13,11 +13,11 @@ function createDoorMaterial(ctx) {
   });
 }
 
-export function setup(ctx) {
+const setup = (ctx) =>  {
   const assets = ctx.assets;
-  var texture = assets['checkboard_tex'];
+  const texture = assets['checkboard_tex'];
 
-  var lightmap = assets['vertigo_lm_tex'];
+  const lightmap = assets['vertigo_lm_tex'];
   const material = new THREE.MeshBasicMaterial({color: 0xffffff, map: texture, lightMap: lightmap} );
 
   scene = assets['vertigo_model'].scene;
@@ -69,7 +69,7 @@ export function setup(ctx) {
   });
 }
 
-export function enter(ctx) {
+const enter = (ctx) =>  {
   ctx.renderer.setClearColor(0x677FA7);
   ctx.scene.add(scene);
   ctx.scene.parent.fog = new THREE.FogExp2(0x677FA7, 0.004);
@@ -79,7 +79,7 @@ export function enter(ctx) {
   ctx.raycontrol.activateState('doorVertigo');
 }
 
-export function exit(ctx) {
+const exit = (ctx) =>  {
   ctx.scene.remove(scene);
   ctx.scene.parent.fog = null;
 
@@ -87,7 +87,7 @@ export function exit(ctx) {
   ctx.raycontrol.deactivateState('doorVertigo');
 }
 
-export function execute(ctx, delta, time) {
+const execute = (ctx, delta, time) =>  {
   doorMaterial.uniforms.time.value = time;
 
   if (door.scale.z > 0.2) {
@@ -95,3 +95,4 @@ export function execute(ctx, delta, time) {
   }
 }
 
+export { setup, exit, enter, execute };

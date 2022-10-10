@@ -3,14 +3,12 @@ import { System } from "ecsy";
 import {
   Area,
   AreaInside,
-  AreaExiting,
-  AreaEntering,
   Object3D,
   AreaChecker,
   BoundingBox,
 } from "../components.js";
 
-export class AreaCheckerSystem extends System {
+class AreaCheckerSystem extends System {
   execute(delta, time) {
     const areas = this.queries.areas.results;
     const checkers = this.queries.checkers.results;
@@ -40,3 +38,5 @@ AreaCheckerSystem.queries = {
     components: [AreaChecker, Object3D],
   },
 };
+
+export { AreaCheckerSystem };

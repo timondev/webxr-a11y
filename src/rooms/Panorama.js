@@ -1,7 +1,7 @@
 import * as THREE from "three";
 import { Text, Position, ParentObject3D } from "../components.js";
 
-var pano = null,
+let pano = null,
   context,
   panel,
   panelText;
@@ -16,12 +16,12 @@ const DATA = [
   "Ruin of romanesque Paulinzella abbey (1106) in Thuringia, Germany.",
 ];
 
-var panoMaterials = [];
+const panoMaterials = [];
 
-export function setup(ctx) {
+const setup = (ctx) =>  {
   const assets = ctx.assets;
   const geometry = new THREE.SphereGeometry(500, 60, 40);
-  for (var i = 0; i < NUM_PANOS; i++) {
+  for (let i = 0; i < NUM_PANOS; i++) {
     const panoName = "pano" + (i + 2);
     panoMaterials[i] = new THREE.MeshBasicMaterial({
       map: assets[panoName],
@@ -42,10 +42,10 @@ export function setup(ctx) {
       fontSize: 0.02,
       anchor: "left",
       textAlign: "left",
-      baseline: "center",
+      baseline: "top",
       maxWidth: 0.34,
       lineHeight: 1.3,
-      text: DATA[i],
+      text: DATA[NUM_PANOS],
     })
     .addComponent(ParentObject3D, { value: panel })
     .addComponent(Position, { x: -0.17, y: 0.003, z: 0.01 });
@@ -56,7 +56,7 @@ export function setup(ctx) {
   });
 }
 
-export function enter(ctx) {
+const enter = (ctx) =>  {
   ctx.renderer.setClearColor(0x000000);
 
   const room = ctx.room - 5;
@@ -72,15 +72,17 @@ export function enter(ctx) {
   context = ctx;
 }
 
-export function exit(ctx) {
+const exit = (ctx) =>  {
   ctx.scene.remove(pano);
   ctx.controllers[1].remove(panel);
 
   ctx.raycontrol.deactivateState("panorama");
 }
 
-export function execute(ctx, delta, time) {}
+const execute = (ctx, delta, time) =>  {}
 
-export function onSelectEnd(evt) {
+const onSelectEnd = (evt) =>  {
   context.goto = 0;
 }
+
+export { setup, exit, enter, execute, onSelectEnd };

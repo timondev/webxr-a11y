@@ -1,12 +1,12 @@
-function clamp(value, min, max) {
+const clamp = (value, min, max) =>  {
   return Math.min(Math.max(value, min), max);
 }
 
-export function hsv2rgb(hsv) {
-  var r, g, b, i, f, p, q, t;
-  var h = clamp(hsv.h, 0, 1);
-  var s = clamp(hsv.s, 0, 1);
-  var v = hsv.v;
+function hsv2rgb(hsv) {
+  let r, g, b, i, f, p, q, t;
+  const h = clamp(hsv.h, 0, 1);
+  const s = clamp(hsv.s, 0, 1);
+  const v = hsv.v;
 
   i = Math.floor(h * 6);
   f = h * 6 - i;
@@ -28,13 +28,13 @@ export function hsv2rgb(hsv) {
   };
 }
 
-export function rgb2hsv(r, g, b) {
-  var max = Math.max(r, g, b);
-  var min = Math.min(r, g, b);
-  var d = max - min;
-  var h;
-  var s = (max === 0 ? 0 : d / max);
-  var v = max;
+function rgb2hsv(r, g, b) {
+  const max = Math.max(r, g, b);
+  const min = Math.min(r, g, b);
+  const d = max - min;
+  let h;
+  const s = (max === 0 ? 0 : d / max);
+  const v = max;
 
   if (arguments.length === 1) { g = r.g; b = r.b; r = r.r; }
 
@@ -46,3 +46,5 @@ export function rgb2hsv(r, g, b) {
   }
   return {h: h, s: s, v: v};
 }
+
+export { hsv2rgb, rgb2hsv };

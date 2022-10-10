@@ -1,5 +1,5 @@
 import * as THREE from "three";
-var scene, listener, timeout, mixer, door, doorMaterial;
+let scene, listener, timeout, mixer, door, doorMaterial;
 
 const soundNames = [
   "bells",
@@ -15,15 +15,15 @@ const soundNames = [
   "trumpet",
 ];
 
-var sounds = {};
+const sounds = {};
 soundNames.forEach((i) => {
   sounds[i] = { animations: [], mesh: null, player: null, shadow: null };
 });
 
 const MAX_REPETITIONS = 3;
-var repetitions = MAX_REPETITIONS - 1;
+let repetitions = MAX_REPETITIONS - 1;
 
-function createDoorMaterial(ctx) {
+const createDoorMaterial = (ctx) =>  {
   return new THREE.ShaderMaterial({
     uniforms: {
       time: { value: 0 },
@@ -35,7 +35,7 @@ function createDoorMaterial(ctx) {
   });
 }
 
-export function setup(ctx) {
+const setup = (ctx) =>  {
   const assets = ctx.assets;
   scene = assets["sound_model"].scene;
   door = assets["sound_door_model"].scene;
@@ -158,9 +158,9 @@ export function setup(ctx) {
   });
 }
 
-var currentSound = -1;
+let currentSound = -1;
 
-function playSound() {
+const playSound = () =>  {
   let sound;
   if (currentSound >= 0) {
     sound = sounds[soundNames[currentSound]];
@@ -193,7 +193,7 @@ function playSound() {
   timeout = setTimeout(playSound, 2000);
 }
 
-export function enter(ctx) {
+const enter = (ctx) =>  {
   ctx.renderer.setClearColor(0x000000);
   ctx.scene.add(scene);
   ctx.scene.add(door);
@@ -204,7 +204,7 @@ export function enter(ctx) {
   ctx.raycontrol.activateState("sound");
 }
 
-export function exit(ctx) {
+const exit = (ctx) =>  {
   ctx.scene.remove(scene);
   ctx.scene.remove(door);
   ctx.camera.remove(listener);
@@ -213,7 +213,7 @@ export function exit(ctx) {
   clearTimeout(timeout);
 }
 
-export function execute(ctx, delta, time) {
+const execute = (ctx, delta, time) =>  {
   mixer.update(delta);
   const sound = sounds[soundNames[currentSound]];
   if (sound && sound.shadow.material.opacity > 0) {
@@ -225,3 +225,5 @@ export function execute(ctx, delta, time) {
     door.scale.z = Math.max(door.scale.z - delta * door.scale.z, 0.5);
   }
 }
+
+export { setup, exit, enter, execute };

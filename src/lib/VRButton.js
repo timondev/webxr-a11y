@@ -16,11 +16,11 @@ var VRButton = {
 
 	createButton: function ( renderer, callback ) {
 
-		function showEnterVR( /*device*/ ) {
+		const showEnterVR = ( /*device*/ ) =>  {
 
 			var currentSession = null;
 
-			function onSessionStarted( session ) {
+			const onSessionStarted = ( session ) =>  {
 
 				session.addEventListener( 'end', onSessionEnded );
 
@@ -32,7 +32,7 @@ var VRButton = {
 				callback('sessionStarted');
 			}
 
-			function onSessionEnded( /*event*/ ) {
+			const onSessionEnded = ( /*event*/ ) =>  {
 
 				currentSession.removeEventListener( 'end', onSessionEnded );
 
@@ -90,7 +90,7 @@ var VRButton = {
 
 		}
 
-		function disableButton() {
+		const disableButton = () =>  {
 
 			button.style.display = '';
 
@@ -105,7 +105,7 @@ var VRButton = {
 
 		}
 
-		function showWebXRNotFound() {
+		const showWebXRNotFound = () =>  {
 
 			disableButton();
 
@@ -113,7 +113,7 @@ var VRButton = {
 
 		}
 
-		function stylizeElement( element ) {
+		const stylizeElement = ( element ) =>  {
 
 			element.style.position = 'absolute';
 			element.style.bottom = '20px';

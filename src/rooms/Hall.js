@@ -6,7 +6,7 @@ import * as xylophone from "../stations/Xylophone.js";
 import * as graffiti from "../stations/Graffiti.js";
 import * as infopanels from "../stations/InfoPanels.js";
 
-var scene,
+let scene,
   hall,
   teleportFloor,
   fader,
@@ -15,7 +15,7 @@ var scene,
   controllers,
   auxVec = new THREE.Vector3();
 
-function createDoorMaterial(ctx) {
+const createDoorMaterial = (ctx) =>  {
   return new THREE.ShaderMaterial({
     uniforms: {
       time: { value: 0 },
@@ -27,7 +27,7 @@ function createDoorMaterial(ctx) {
   });
 }
 
-export function setup(ctx) {
+const setup = (ctx) =>  {
   const assets = ctx.assets;
   scene = new THREE.Object3D();
 
@@ -138,7 +138,7 @@ export function setup(ctx) {
   ctx.camera.add(fader);
 }
 
-export function enter(ctx) {
+const enter = (ctx) =>  {
   ctx.systemsGroup["roomHall"].play();
   ctx.renderer.setClearColor(0xc0dffb);
   ctx.scene.add(scene);
@@ -152,7 +152,7 @@ export function enter(ctx) {
   panoballs.enter(ctx);
 }
 
-export function exit(ctx) {
+const exit = (ctx) =>  {
   ctx.systemsGroup["roomHall"].stop();
   ctx.scene.remove(scene);
 
@@ -162,7 +162,7 @@ export function exit(ctx) {
   xylophone.exit(ctx);
 }
 
-export function execute(ctx, delta, time) {
+const execute = (ctx, delta, time) =>  {
   panoballs.execute(ctx, delta, time);
   paintings.execute(ctx, delta, time);
   xylophone.execute(ctx, delta, time, controllers);
@@ -172,7 +172,7 @@ export function execute(ctx, delta, time) {
   updateUniforms(time);
   //checkCameraBoundaries(ctx);
 
-  for (var i = 0; i < doors.length; i++) {
+  for (let i = 0; i < doors.length; i++) {
     if (doors[i].scale.z > 1) {
       doors[i].scale.z = Math.max(
         doors[i].scale.z - delta * doors[i].scale.z,
@@ -182,7 +182,7 @@ export function execute(ctx, delta, time) {
   }
 }
 
-function updateUniforms(time) {
+const updateUniforms = (time) =>  {
   objectMaterials.doorA.uniforms.time.value = time;
   objectMaterials.doorB.uniforms.time.value = time;
   objectMaterials.doorC.uniforms.time.value = time;
@@ -191,11 +191,11 @@ function updateUniforms(time) {
   panoballs.updateUniforms(time);
 }
 
-function checkCameraBoundaries(ctx) {
+const checkCameraBoundaries = (ctx) =>  {
   auxVec.copy(ctx.camera.position).add(ctx.cameraRig.position);
   const cam = auxVec;
   const margin = 0.25;
-  var fade = 0;
+  let fade = 0;
   if (cam.y < margin) {
     fade = 1 - cam.y / margin;
   } else if (cam.x < -5.4) {
@@ -209,3 +209,5 @@ function checkCameraBoundaries(ctx) {
   }
   fader.material.opacity = Math.min(1, Math.max(0, fade));
 }
+
+export { setup, exit, enter, execute };

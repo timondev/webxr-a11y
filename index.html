@@ -208,11 +208,11 @@
     </style>
     <script defer type="module" src="./src/index.js"></script>
     <script type="text/javascript">
-      function aclick(ev) {
+      const aclick = (ev) =>  {
         ev.stopPropagation();
       }
 
-      function setHandedness(link, hand) {
+      const setHandedness = (link, hand) =>  {
         var currentURL = new URL(window.location);
         currentURL.searchParams.set("handedness", hand);
         link.href = currentURL.href;

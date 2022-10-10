@@ -13,7 +13,7 @@ let updatePosition = (entity) => {
   object3D.position.copy(position);
 };
 
-export default class TransformSystem extends System {
+class TransformSystem extends System {
   execute(delta, time) {
     // Position
     this.queries.position.added.forEach(updatePosition);
@@ -41,3 +41,5 @@ TransformSystem.queries = {
     },
   },
 };
+
+export { TransformSystem };
