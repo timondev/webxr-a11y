@@ -1,11 +1,11 @@
-import * as THREE from 'three';
+import * as THREE from 'three'
 
-const PATH_TIME = 3; // 3 secs per path
+const PATH_TIME = 3 // 3 secs per path
 
 class Slideshow {
-  get paths() {
+  get paths () {
     return [
-      //'hall'
+      // 'hall'
       [
         {
           from: new THREE.Vector3(0, 1.6, 0),
@@ -32,16 +32,16 @@ class Slideshow {
           angularVelocity: new THREE.Vector3(0, -0.1, 0)
         }
       ],
-      //'sound'
+      // 'sound'
       [
         {
           from: new THREE.Vector3(0, 1.6, 0),
           lookAt: new THREE.Vector3(0, 0, -100),
           velocity: new THREE.Vector3(0.1, 0, 0.1),
           angularVelocity: new THREE.Vector3(0, 0.01, 0)
-        },
+        }
       ],
-      //'photogrammetry'
+      // 'photogrammetry'
       [
         {
           from: new THREE.Vector3(0, 1.2, 0.8),
@@ -56,7 +56,7 @@ class Slideshow {
           angularVelocity: new THREE.Vector3(0, 0, 0)
         }
       ],
-      //'vertigo'
+      // 'vertigo'
       [
         {
           from: new THREE.Vector3(0, 1.6, 0),
@@ -71,7 +71,7 @@ class Slideshow {
           angularVelocity: new THREE.Vector3(0.07, 0, 0)
         }
       ],
-      //'panoramastereo'
+      // 'panoramastereo'
       [
         {
           from: new THREE.Vector3(0, 0, 0),
@@ -80,22 +80,22 @@ class Slideshow {
           angularVelocity: new THREE.Vector3(0.03, 0.05, 0)
         }
       ],
-      //'panorama1'
+      // 'panorama1'
       [
       ],
-      //'panorama2'
+      // 'panorama2'
       [
-          {
+        {
           from: new THREE.Vector3(0, 0, 0),
           lookAt: new THREE.Vector3(-100, 0, 0),
           velocity: new THREE.Vector3(0, 0, 0),
           angularVelocity: new THREE.Vector3(0.01, 0.1, 0)
         }
       ],
-      //'panorama3'
+      // 'panorama3'
       [
       ],
-      //'panorama4'
+      // 'panorama4'
       [
         {
           from: new THREE.Vector3(0, 0, 0),
@@ -104,7 +104,7 @@ class Slideshow {
           angularVelocity: new THREE.Vector3(-0.07, -0.05, 0)
         }
       ],
-      //'panorama5'
+      // 'panorama5'
       [
         {
           from: new THREE.Vector3(0, 0, 0),
@@ -113,63 +113,63 @@ class Slideshow {
           angularVelocity: new THREE.Vector3(0, -0.02, 0)
         }
       ]
-    ];
+    ]
   }
 
-  setup(context) {
-    this.room = undefined;
-    this.path = undefined;
-    this.next(context);
-    context.camera.position.set(0, 1.6, 0);
-    context.cameraRig.position.set(0, 0, 2);
-    context.goto = this.room;
+  setup (context) {
+    this.room = undefined
+    this.path = undefined
+    this.next(context)
+    context.camera.position.set(0, 1.6, 0)
+    context.cameraRig.position.set(0, 0, 2)
+    context.goto = this.room
   }
 
-  next(context) {
-    this.time = PATH_TIME + Math.random() * PATH_TIME / 2;
+  next (context) {
+    this.time = PATH_TIME + Math.random() * PATH_TIME / 2
     if (this.room === undefined) {
-      this.room = 0;
-      this.path = 0;
+      this.room = 0
+      this.path = 0
     } else {
-      this.path ++;
-      if (this.path >= this.paths[this.room].length){
+      this.path++
+      if (this.path >= this.paths[this.room].length) {
         // find next room with paths
         do {
-          this.room ++;
+          this.room++
           if (this.room >= this.paths.length) {
-            this.room = 0;
-            context.cameraRig.position.set(0, 0, 2);
+            this.room = 0
+            context.cameraRig.position.set(0, 0, 2)
           }
-        } while (!this.paths[this.room].length);
-        const camera = context.renderer.xr.getCamera(context.camera);
-        camera.position.set(0, 1.6, 0);
-        context.goto = this.room;
-        this.path = 0;
+        } while (!this.paths[this.room].length)
+        const camera = context.renderer.xr.getCamera(context.camera)
+        camera.position.set(0, 1.6, 0)
+        context.goto = this.room
+        this.path = 0
       }
     }
-    this.reset = true;
+    this.reset = true
   }
 
-  execute(context, delta, time) {
-    const path = this.paths[this.room][this.path];
+  execute (context, delta, time) {
+    const path = this.paths[this.room][this.path]
     if (this.reset) {
-      this.reset = false;
+      this.reset = false
       // init camera settings
-      context.camera.position.copy(path.from);
-      context.camera.rotation.set(0, 0, 0);
-      context.camera.lookAt(path.lookAt);
+      context.camera.position.copy(path.from)
+      context.camera.rotation.set(0, 0, 0)
+      context.camera.lookAt(path.lookAt)
     }
-    context.camera.position.addScaledVector(path.velocity, delta);
-    context.camera.rotation.x += path.angularVelocity.x * delta;
-    context.camera.rotation.y += path.angularVelocity.y * delta;
-    context.camera.rotation.z += path.angularVelocity.z * delta;
-    this.time -= delta;
+    context.camera.position.addScaledVector(path.velocity, delta)
+    context.camera.rotation.x += path.angularVelocity.x * delta
+    context.camera.rotation.y += path.angularVelocity.y * delta
+    context.camera.rotation.z += path.angularVelocity.z * delta
+    this.time -= delta
     if (this.time < 0) {
-      this.next(context);
+      this.next(context)
     }
   }
 }
 
-const slideshow = new Slideshow();
+const slideshow = new Slideshow()
 
-export { slideshow };
+export { slideshow }
