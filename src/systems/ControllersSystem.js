@@ -1,6 +1,15 @@
-import * as THREE from 'three';
-import {System} from 'ecsy';
-import {Area, AreaReactor, AreaInside, AreaExiting, AreaEntering, Object3D, AreaChecker, BoundingBox} from '../components/index.js';
+import * as THREE from "three";
+import { System } from "ecsy";
+import {
+  Area,
+  AreaReactor,
+  AreaInside,
+  AreaExiting,
+  AreaEntering,
+  Object3D,
+  AreaChecker,
+  BoundingBox,
+} from "../components.js";
 
 export class ControllersSystem extends System {
   execute(delta, time) {
@@ -26,7 +35,7 @@ ControllersSystem.queries = {
     components: [AreaChecker, Object3D, AreaInside],
     listen: {
       added: true,
-      removed: true
-    }
-  }
-}
+      removed: true,
+    },
+  },
+};

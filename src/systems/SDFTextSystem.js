@@ -1,7 +1,7 @@
 import * as THREE from "three";
 import { System } from "ecsy";
 import { Text as TextMesh } from "troika-three-text";
-import { Object3D, Text } from "../components/index.js";
+import { Object3D, Text } from "../components.js";
 
 const anchorMapping = {
   left: 0,

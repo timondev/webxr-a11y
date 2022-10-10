@@ -1,13 +1,13 @@
-import {System} from 'ecsy';
-import {Object3D, Rotation, Position} from '../components/index.js';
+import { System } from "ecsy";
+import { Object3D, Rotation, Position } from "../components.js";
 
-let updateRotation = entity => {
+let updateRotation = (entity) => {
   const rotation = entity.getComponent(Rotation);
   const object3D = entity.getComponent(Object3D).value;
   object3D.rotation.set(rotation.x, rotation.y, rotation.z);
 };
 
-let updatePosition = entity => {
+let updatePosition = (entity) => {
   const position = entity.getComponent(Position);
   const object3D = entity.getComponent(Object3D).value;
   object3D.position.copy(position);
@@ -30,14 +30,14 @@ TransformSystem.queries = {
     components: [Position, Object3D],
     listen: {
       added: true,
-      changed: true
-    }
+      changed: true,
+    },
   },
   rotation: {
     components: [Rotation, Object3D],
     listen: {
       added: true,
-      changed: true
-    }
-  }
-}
+      changed: true,
+    },
+  },
+};
