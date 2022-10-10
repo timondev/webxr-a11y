@@ -196,6 +196,27 @@ export function init() {
 
   var w = 100;
   ecsyWorld = new World();
+
+  ecsyWorld
+    .registerComponent(Object3D)
+    .registerComponent(Rotation)
+    .registerComponent(Position)
+    .registerComponent(ParentObject3D)
+    .registerComponent(Text)
+    .registerComponent(BoundingBox)
+    .registerComponent(BoundingSphere)
+    .registerComponent(Area)
+    .registerComponent(AreaEntering)
+    .registerComponent(AreaExiting)
+    .registerComponent(AreaInside)
+    .registerComponent(AreaChecker)
+    .registerComponent(AreaReactor)
+    .registerComponent(DebugHelper)
+    .registerComponent(DebugHelperMesh)
+    .registerComponent(Billboard)
+    .registerComponent(Children)
+    .registerComponent(Opacity);
+
   ecsyWorld
     .registerSystem(SDFTextSystem)
     .registerSystem(AreaCheckerSystem)
