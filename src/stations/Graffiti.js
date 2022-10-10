@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import ColorWheel from "../lib/ColorWheel";
+import { ColorWheel } from "../lib/ColorWheel";
 import {
   Area,
   AreaReactor,
@@ -11,27 +11,27 @@ import {
 } from "../components";
 import { angleBetween, getRandomInt } from "../lib/utils.js";
 
-var colorWheel;
+let colorWheel;
 
-export function enter(ctx) {
+const enter = (ctx) =>  {
   //ctx.raycontrol.activateState('graffiti');
   if (colorWheel) {
     colorWheel.enter();
   }
 }
 
-var material, wall, drawContext;
-var lastPosition = new THREE.Vector2();
-var brushImg, canvasTmp, ctxTmp;
+let material, wall, drawContext;
+let lastPosition = new THREE.Vector2();
+let brushImg, canvasTmp, ctxTmp;
 
-var lastController;
-var paintImg = new Image();
+let lastController;
+let paintImg = new Image();
 
-function colorize(r, g, b) {
+const colorize = (r, g, b) =>  {
   ctxTmp.clearRect(0, 0, canvasTmp.width, canvasTmp.height);
   ctxTmp.drawImage(brushImg, 0, 0);
   let imgData = ctxTmp.getImageData(0, 0, canvasTmp.width, canvasTmp.height);
-  for (var t = 0; t < imgData.data.length; t += 4) {
+  for (let t = 0; t < imgData.data.length; t += 4) {
     imgData.data[t] = (r * imgData.data[t]) / 255;
     imgData.data[t + 1] = (g * imgData.data[t + 1]) / 255;
     imgData.data[t + 2] = (b * imgData.data[t + 2]) / 255;
@@ -40,7 +40,7 @@ function colorize(r, g, b) {
   paintImg.src = canvasTmp.toDataURL();
 }
 
-export function setup(ctx, hall) {
+const setup = (ctx, hall) =>  {
   let area = ctx.world.createEntity();
   area.name = "area";
   area
@@ -57,7 +57,7 @@ export function setup(ctx, hall) {
   let checkerSpray = ctx.world.createEntity();
   let spray = ctx.assets["spray_model"].scene;
 
-  function attachSprayCan(controllerData) {
+  const attachSprayCan = (controllerData) =>  {
     let controller = controllerData.controller;
     const handedness = controllerData.inputSource.handedness;
     let listener = new THREE.AudioListener();
@@ -85,7 +85,7 @@ export function setup(ctx, hall) {
     controller.add(spray);
   }
 
-  function attachColorWheel(controllerData) {
+  const attachColorWheel = (controllerData) =>  {
     let controller = controllerData.controller;
     colorWheel = new ColorWheel(ctx, controller, (rgb) => {
       colorize(rgb.r, rgb.g, rgb.b);
@@ -157,11 +157,7 @@ export function setup(ctx, hall) {
 
   brushImg = new Image();
   canvasTmp = document.createElement("canvas");
-  //canvasTmp.style.position = "absolute";
-  //canvasTmp.style.width = "20%";
-  //canvasTmp.style.backgroundColor = "#333";
   ctxTmp = canvasTmp.getContext("2d");
-  // document.body.appendChild(canvasTmp);
 
   brushImg.onload = () => {
     canvasTmp.width = brushImg.width;
@@ -170,7 +166,7 @@ export function setup(ctx, hall) {
   };
   brushImg.src = "assets/spray_brush.png";
 
-  var drawingCanvas = document.createElement("canvas");
+  const drawingCanvas = document.createElement("canvas");
 
   drawingCanvas.width = width;
   drawingCanvas.height = height;
@@ -190,14 +186,14 @@ export function setup(ctx, hall) {
   wall = hall.getObjectByName("graffiti");
   wall.material = material;
 
-  var aux2 = new THREE.Vector2();
+  const aux2 = new THREE.Vector2();
 
   ctx.raycontrol.addState("graffiti", {
     colliderMesh: wall,
     lineStyleOnIntersection: "basic",
     onHover: (intersection, active, controller) => {
       if (active) {
-        var distance = intersection.distance;
+        const distance = intersection.distance;
 
         if (distance > maxDistance) {
           return;
@@ -210,15 +206,15 @@ export function setup(ctx, hall) {
         drawContext.imageSmoothingEnabled = true;
         drawContext.fillStyle = "#f00";
         drawContext.strokeStyle = "#0f0";
-        var dist = lastPosition.distanceTo(aux2);
-        var angle = angleBetween(lastPosition, aux2);
+        const dist = lastPosition.distanceTo(aux2);
+        const angle = angleBetween(lastPosition, aux2);
         let alpha = THREE.MathUtils.clamp(1 - distance, 0, 1);
 
         drawContext.globalAlpha = alpha;
 
-        for (var i = 0; i < dist; i++ /* +=4 */) {
-          var _x = lastPosition.x + Math.sin(angle) * i;
-          var _y = lastPosition.y + Math.cos(angle) * i;
+        for (let i = 0; i < dist; i++ /* +=4 */) {
+          const _x = lastPosition.x + Math.sin(angle) * i;
+          const _y = lastPosition.y + Math.cos(angle) * i;
           drawContext.save();
           drawContext.translate(_x, _y);
           let r = THREE.MathUtils.lerp(0.001, 0.2, distance);
@@ -241,7 +237,7 @@ export function setup(ctx, hall) {
     },
     onHoverLeave: (intersection) => {},
     onSelectStart: (intersection, controller) => {
-      var distance = intersection.distance;
+      const distance = intersection.distance;
 
       if (distance > maxDistance) {
         return;
@@ -264,4 +260,6 @@ export function setup(ctx, hall) {
   });
 }
 
-export function execute(ctx, delta, time) {}
+const execute = (ctx, delta, time) =>  {}
+
+export { setup, enter, execute };

@@ -1,8 +1,8 @@
 import * as THREE from 'three';
-import EventDispatcher from './EventDispatcher.js';
+import { EventDispatcher } from './EventDispatcher.js';
 
-var tempMatrix = new THREE.Matrix4();
-export var rayMaterial;
+const tempMatrix = new THREE.Matrix4();
+let rayMaterial;
 const validStateController = [
   "primary",
   "secondary",
@@ -11,7 +11,7 @@ const validStateController = [
   "right"
 ];
 
-export default class RayControl extends EventDispatcher {
+class RayControl extends EventDispatcher {
   enable() {
     this.setLineStyle(this.previousLineStyle);
     this.enabled = true;
@@ -144,7 +144,7 @@ export default class RayControl extends EventDispatcher {
     this.states = {};
     this.currentStates = [];
 
-    var line = ctx.assets['teleport_model'].scene.getObjectByName('beam');
+    const line = ctx.assets['teleport_model'].scene.getObjectByName('beam');
 
     ctx.assets['beam_tex'].wrapT = THREE.RepeatWrapping;
     ctx.assets['beam_tex'].wrapS = THREE.RepeatWrapping;
@@ -173,7 +173,7 @@ export default class RayControl extends EventDispatcher {
     this.raycasterContext.add(this.line0);
     this.raycasterContext.name = 'raycasterContext';
 
-    var geometry = new THREE.BufferGeometry().setFromPoints( [ new THREE.Vector3( 0, 0, 0 ), new THREE.Vector3( 0, 0, - 1 ) ] );
+    const geometry = new THREE.BufferGeometry().setFromPoints( [ new THREE.Vector3( 0, 0, 0 ), new THREE.Vector3( 0, 0, - 1 ) ] );
 
     this.lineBasic = new THREE.Line( geometry );
     this.lineBasic.name = 'line';
@@ -233,11 +233,11 @@ export default class RayControl extends EventDispatcher {
 
     let firstHit = false;
 
-    var stateIntersections = {};
-    for (var c = 0; c < this.controllers.length; c++) {
+    const stateIntersections = {};
+    for (let c = 0; c < this.controllers.length; c++) {
       let controllerData = this.controllers[c];
 
-      for (var i = 0; i < this.currentStates.length; i++) {
+      for (let i = 0; i < this.currentStates.length; i++) {
         let state = this.currentStates[i];
         if (!state.raycaster) {
           continue;
@@ -266,7 +266,7 @@ export default class RayControl extends EventDispatcher {
     this.lineBasic.scale.z = Math.min(this.rayLength, 1);
 
     // For each controller, find the closest intersection from all the states
-    for (var c = 0; c < this.controllers.length; c++) {
+    for (let c = 0; c < this.controllers.length; c++) {
       let controllerData = this.controllers[c];
       let intersections = Object.entries(controllerData.intersections).filter(i => i[1] !== null);
       if (intersections.length > 0) {
@@ -299,7 +299,7 @@ export default class RayControl extends EventDispatcher {
     }
 
     // Handle onHoverLeave
-    for (var c = 0; c < this.controllers.length; c++) {
+    for (let c = 0; c < this.controllers.length; c++) {
       let controllerData = this.controllers[c];
       if (!controllerData.prevIntersection) {
         continue;
@@ -368,3 +368,5 @@ export default class RayControl extends EventDispatcher {
     controllerData.active = false;
   }
 }
+
+export { rayMaterial, RayControl };

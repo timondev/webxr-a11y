@@ -2,7 +2,7 @@ import * as THREE from "three";
 import { System } from "ecsy";
 import { Object3D, ParentObject3D } from "../components.js";
 
-export default class HierarchySystem extends System {
+class HierarchySystem extends System {
   execute(delta, time) {
     this.queries.entities.added.forEach((entity) => {
       const parent = entity.getComponent(ParentObject3D).value;
@@ -35,3 +35,5 @@ HierarchySystem.queries = {
     },
   },
 };
+
+export { HierarchySystem };

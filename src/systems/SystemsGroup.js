@@ -1,4 +1,4 @@
-export default class SystemsGroup {
+class SystemsGroup {
   constructor(world, Systems) {
     this.Systems = Systems;
     this.world = world;
@@ -12,3 +12,5 @@ export default class SystemsGroup {
     this.Systems.forEach(System => this.world.getSystem(System).stop());
   }
 }
+
+export { SystemsGroup };

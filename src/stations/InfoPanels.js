@@ -9,12 +9,12 @@ import {
 } from "../components.js";
 import INFO_DATA from "./InfoPanelsData.js";
 
-var panels = [],
+const panels = [],
   panelTexts = [],
   panelsEntity = [];
 
-export function setup(ctx, hall) {
-  for (var i = 0; i < INFO_DATA.length; i++) {
+const setup = (ctx, hall) =>  {
+  for (let i = 0; i < INFO_DATA.length; i++) {
     const id = i < 10 ? "0" + i : i;
     panels[i] = hall.getObjectByName("infopanel0" + id);
     panels[i].geometry.computeBoundingBox();
@@ -57,5 +57,7 @@ export function setup(ctx, hall) {
   }
 }
 
-export function enter(ctx) {}
-export function execute(ctx, delta, time) {}
+const enter = (ctx) =>  {}
+const execute = (ctx, delta, time) =>  {}
+
+export { setup, enter, execute };

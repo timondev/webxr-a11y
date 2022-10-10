@@ -14,7 +14,7 @@ const baselineMapping = {
   bottom: 1,
 };
 
-export class SDFTextSystem extends System {
+class SDFTextSystem extends System {
   updateText(textMesh, textComponent) {
     textMesh.text = textComponent.text;
     textMesh.textAlign = textComponent.textAlign;
@@ -33,10 +33,10 @@ export class SDFTextSystem extends System {
   }
 
   execute(delta, time) {
-    var entities = this.queries.entities;
+    const entities = this.queries.entities;
 
     entities.added.forEach((e) => {
-      var textComponent = e.getComponent(Text);
+      const textComponent = e.getComponent(Text);
 
       const textMesh = new TextMesh();
       textMesh.name = "textMesh";
@@ -48,16 +48,16 @@ export class SDFTextSystem extends System {
     });
 
     entities.removed.forEach((e) => {
-      var object3D = e.getComponent(Object3D).value;
-      var textMesh = object3D.getObjectByName("textMesh");
+      const object3D = e.getComponent(Object3D).value;
+      const textMesh = object3D.getObjectByName("textMesh");
       textMesh.dispose();
       object3D.remove(textMesh);
     });
 
     entities.changed.forEach((e) => {
-      var object3D = e.getComponent(Object3D).value;
+      const object3D = e.getComponent(Object3D).value;
       if (object3D instanceof TextMesh) {
-        var textComponent = e.getComponent(Text);
+        const textComponent = e.getComponent(Text);
         this.updateText(object3D, textComponent);
       }
     });
@@ -74,3 +74,5 @@ SDFTextSystem.queries = {
     },
   },
 };
+
+export { SDFTextSystem };

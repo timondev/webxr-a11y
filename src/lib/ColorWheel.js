@@ -1,7 +1,7 @@
 import * as THREE from "three";
 import { hsv2rgb } from "../lib/ColorUtils.js";
 
-export default class ColorWheel {
+class ColorWheel {
   constructor(ctx, controller, onColorChanged) {
     this.ctx = ctx;
     this.radius = 0.1;
@@ -9,7 +9,7 @@ export default class ColorWheel {
     this.rgb = { r: 0, g: 0, b: 0 };
     this.onColorChanged = onColorChanged;
     const geometry = new THREE.CircleGeometry(this.radius, 12);
-    var vertexShader =
+    const vertexShader =
       "\
       varying vec2 vUv;\
       void main() {\
@@ -19,7 +19,7 @@ export default class ColorWheel {
       }\
       ";
 
-    var fragmentShader =
+    const fragmentShader =
       "\
       #define M_PI2 6.28318530718\n \
       uniform float brightness;\
@@ -41,7 +41,7 @@ export default class ColorWheel {
       }\
       ";
 
-    var material = new THREE.ShaderMaterial({
+    const material = new THREE.ShaderMaterial({
       uniforms: { brightness: { type: "f", value: this.hsv.v } },
       vertexShader: vertexShader,
       fragmentShader: fragmentShader,
@@ -60,8 +60,8 @@ export default class ColorWheel {
     this.ui.add(this.mesh);
     this.ui.add(this.blackMesh);
 
-    var geometryRing = new THREE.RingGeometry(0.005, 0.01, 32);
-    var materialRing = new THREE.MeshBasicMaterial({
+    const geometryRing = new THREE.RingGeometry(0.005, 0.01, 32);
+    const materialRing = new THREE.MeshBasicMaterial({
       color: 0xffff00,
       side: THREE.DoubleSide,
     });
@@ -82,7 +82,7 @@ export default class ColorWheel {
       order: -1,
       onHover: (intersection, active, controller) => {
         if (active) {
-          var point = intersection.point.clone();
+          const point = intersection.point.clone();
           this.mesh.worldToLocal(point);
 
           this.colorSelector.position.x = point.x;
@@ -92,7 +92,7 @@ export default class ColorWheel {
       onHoverLeave: (intersection) => {},
       onSelectStart: (intersection, controller) => {
         if (intersection.object.name === "colorWheel") {
-          var point = intersection.point.clone();
+          const point = intersection.point.clone();
           this.mesh.updateMatrixWorld();
           this.mesh.worldToLocal(point);
 
@@ -105,7 +105,7 @@ export default class ColorWheel {
             r: this.radius * Math.sqrt(uv.x * uv.x + uv.y * uv.y),
             theta: Math.PI + Math.atan2(uv.y, uv.x),
           };
-          var angle = (polarPosition.theta * (180 / Math.PI) + 180) % 360;
+          const angle = (polarPosition.theta * (180 / Math.PI) + 180) % 360;
           this.hsv.h = angle / 360;
           this.hsv.s = polarPosition.r / this.radius;
           this.updateColor();
@@ -137,3 +137,5 @@ export default class ColorWheel {
     this.ctx.raycontrol.deactivateState("colorwheel");
   }
 }
+
+export { ColorWheel };

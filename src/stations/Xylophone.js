@@ -1,7 +1,7 @@
 import * as THREE from 'three';
-import PositionalAudioPolyphonic from '../lib/PositionalAudioPolyphonic.js';
+import { PositionalAudioPolyphonic } from '../lib/PositionalAudioPolyphonic.js';
 
-var
+let
   listener,
   xyloSticks = [null, null],
   xyloStickBalls = [null, null],
@@ -9,18 +9,18 @@ var
   bbox = new THREE.Box3(),
   hallRef = null;
 
-var auxVec = new THREE.Vector3();
+const auxVec = new THREE.Vector3();
 
-var NUM_NOTES = 13;
+const NUM_NOTES = 13;
 
-var stickNotesColliding = [
+const stickNotesColliding = [
   new Array(NUM_NOTES).fill(false),
   new Array(NUM_NOTES).fill(false)
 ];
 
-var _ctx = null;
+let _ctx = null;
 
-export function setup(ctx, hall) {
+const setup = (ctx, hall) =>  {
   _ctx = ctx;
   const audioLoader = new THREE.AudioLoader();
   listener = new THREE.AudioListener();
@@ -60,7 +60,7 @@ export function setup(ctx, hall) {
   xyloStickBalls[1].geometry.computeBoundingBox();
 }
 
-export function enter(ctx) {
+const enter = (ctx) =>  {
   ctx.camera.add(listener);
 
   let selectStart = onSelectStart.bind(this);
@@ -72,7 +72,7 @@ export function enter(ctx) {
   ctx.controllers[1].addEventListener('selectend', selectEnd);
 }
 
-export function exit(ctx) {
+const exit = (ctx) =>  {
   ctx.camera.remove(listener);
 
   let selectStart = onSelectStart.bind(this);
@@ -84,7 +84,7 @@ export function exit(ctx) {
   ctx.controllers[1].removeEventListener('selectend', selectEnd);
 }
 
-function hitTest(obj1, obj2) {
+const hitTest = (obj1, obj2) =>  {
   bbox.setFromObject(obj2);
   if (obj1.boundingBox.intersectsBox(bbox)){
     return true;
@@ -92,11 +92,11 @@ function hitTest(obj1, obj2) {
   return false;
 }
 
-function setStickColor(stick, color) {
+const setStickColor = (stick, color) =>  {
   xyloStickBalls[stick].material.color.set(color);
 }
 
-export function execute(ctx, delta, time) {
+const execute = (ctx, delta, time) =>  {
   let controllers = ctx.controllers;
 
   if (!controllers) {return;}
@@ -158,7 +158,7 @@ export function execute(ctx, delta, time) {
   }
 }
 
-export function onSelectStart(evt) {
+const onSelectStart = (evt) =>  {
   let controller = evt.target;
   if (controller.userData.grabbing !== null){ return; }
 
@@ -187,7 +187,7 @@ export function onSelectStart(evt) {
   return true;
 }
 
-export function onSelectEnd(evt) {
+const onSelectEnd = (evt) =>  {
   _ctx.raycontrol.enable();
 
   let controller = evt.target;
@@ -204,3 +204,5 @@ export function onSelectEnd(evt) {
   }
   return true;
 }
+
+export { setup, enter, exit, execute, onSelectStart, onSelectEnd };

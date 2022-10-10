@@ -11,7 +11,7 @@ import {
   BoundingBox,
 } from "../components.js";
 
-export class ControllersSystem extends System {
+class ControllersSystem extends System {
   execute(delta, time) {
     const added = this.queries.checkers.added;
     const removed = this.queries.checkers.removed;
@@ -39,3 +39,5 @@ ControllersSystem.queries = {
     },
   },
 };
+
+export { ControllersSystem };

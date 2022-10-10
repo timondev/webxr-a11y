@@ -88,7 +88,6 @@ class BoundingBox extends Component {
     super();
     this.min = new THREE.Vector3();
     this.max = new THREE.Vector3();
-    // this.box3?
   }
 
   reset() {

@@ -1,7 +1,7 @@
 import * as THREE from "three";
-var panoL, panoR, context;
+let panoL, panoR, context;
 
-export function setup(ctx) {
+const setup = (ctx) =>  {
   const assets = ctx.assets;
   const geometry = new THREE.SphereGeometry(500, 60, 40);
   const materialL = new THREE.MeshBasicMaterial({
@@ -23,7 +23,7 @@ export function setup(ctx) {
   });
 }
 
-export function enter(ctx) {
+const enter = (ctx) =>  {
   ctx.renderer.setClearColor(0x000000);
   ctx.scene.add(panoL);
   ctx.scene.add(panoR);
@@ -33,15 +33,17 @@ export function enter(ctx) {
   ctx.raycontrol.activateState("panoramaStereo");
 }
 
-export function exit(ctx) {
+const exit = (ctx) =>  {
   ctx.scene.remove(panoL);
   ctx.scene.remove(panoR);
   ctx.camera.layers.disable(1);
   ctx.raycontrol.deactivateState("panoramaStereo");
 }
 
-export function execute(ctx, delta, time) {}
+const execute = (ctx, delta, time) =>  {}
 
-export function onSelectEnd(evt) {
+const onSelectEnd = (evt) =>  {
   context.goto = 0;
 }
+
+export { setup, exit, enter, execute, onSelectEnd };

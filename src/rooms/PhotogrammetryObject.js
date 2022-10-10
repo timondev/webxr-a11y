@@ -1,7 +1,7 @@
 import * as THREE from 'three';
-var scene, doorMaterial, door;
+let scene, doorMaterial, door;
 
-function createDoorMaterial(ctx) {
+const createDoorMaterial = (ctx) =>  {
   return new THREE.ShaderMaterial({
     uniforms: {
       time: {value: 0},
@@ -13,7 +13,7 @@ function createDoorMaterial(ctx) {
   });
 }
 
-export function setup(ctx) {
+const setup = (ctx) =>  {
   const assets = ctx.assets;
   scene = assets['pg_object_model'].scene;
   scene.rotation.y = -Math.PI / 2;
@@ -76,24 +76,26 @@ export function setup(ctx) {
   });
 }
 
-export function enter(ctx) {
+const enter = (ctx) =>  {
   ctx.renderer.setClearColor(0x000000);
   ctx.scene.add(scene);
   ctx.raycontrol.activateState('doorPhotogrammetry');
   ctx.raycontrol.activateState('teleportPhotogrammetry');
 }
 
-export function exit(ctx) {
+const exit = (ctx) =>  {
   ctx.raycontrol.deactivateState('doorPhotogrammetry');
   ctx.raycontrol.deactivateState('teleportPhotogrammetry');
 
   ctx.scene.remove(scene);
 }
 
-export function execute(ctx, delta, time) {
+const execute = (ctx, delta, time) =>  {
   doorMaterial.uniforms.time.value = time;
 
   if (door.scale.z > 0.5) {
     door.scale.z = Math.max(door.scale.z - delta * door.scale.z, 0.5);
   }
 }
+
+export { setup, exit, enter, execute };

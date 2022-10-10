@@ -12,7 +12,7 @@ const SHOW_DISTANCE = 4;
 
 var cameraPosition = new THREE.Vector3();
 
-export default class BillboardSystem extends System {
+class BillboardSystem extends System {
   execute(delta, time) {
     window.context.camera.getWorldPosition(cameraPosition);
 
@@ -49,3 +49,5 @@ BillboardSystem.queries = {
     components: [Billboard, Object3D],
   },
 };
+
+export { BillboardSystem };

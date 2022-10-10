@@ -1,10 +1,10 @@
-import {rayMaterial} from "./RayControl.js";
+import { rayMaterial } from "./RayControl.js";
 import * as THREE from 'three';
 
-var tempMatrix = new THREE.Matrix4();
-var intersected = [];
+const tempMatrix = new THREE.Matrix4();
+const intersected = [];
 
-export default class Teleport {
+class Teleport {
   constructor(ctx, mesh) {
     this.ctx = ctx;
 
@@ -94,3 +94,4 @@ export default class Teleport {
   }
 }
 
+export { Teleport };

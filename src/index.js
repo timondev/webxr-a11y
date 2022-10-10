@@ -11,11 +11,11 @@ import { SDFTextSystem } from "./systems/SDFTextSystem.js";
 import { DebugHelperSystem } from "./systems/DebugHelperSystem.js";
 import { AreaCheckerSystem } from "./systems/AreaCheckerSystem.js";
 import { ControllersSystem } from "./systems/ControllersSystem.js";
-import HierarchySystem from "./systems/HierarchySystem.js";
-import TransformSystem from "./systems/TransformSystem.js";
-import BillboardSystem from "./systems/BillboardSystem.js";
+import { HierarchySystem } from "./systems/HierarchySystem.js";
+import { TransformSystem } from "./systems/TransformSystem.js";
+import { BillboardSystem } from "./systems/BillboardSystem.js";
 
-import SystemsGroup from "./systems/SystemsGroup.js";
+import { SystemsGroup } from "./systems/SystemsGroup.js";
 
 import assets from "./assets.js";
 
@@ -40,8 +40,8 @@ import {
   Opacity,
 } from "./components.js";
 
-import RayControl from "./lib/RayControl.js";
-import Teleport from "./lib/Teleport.js";
+import { RayControl } from "./lib/RayControl.js";
+import { Teleport } from "./lib/Teleport.js";
 
 import * as roomHall from "./rooms/Hall.js";
 import * as roomPanorama from "./rooms/Panorama.js";
@@ -53,23 +53,24 @@ import * as roomSound from "./rooms/Sound.js";
 import { shaders } from "./lib/shaders.js";
 
 import WebXRPolyfill from "webxr-polyfill";
+import { detectWebXR } from "./lib/utils.js";
 const polyfill = new WebXRPolyfill();
 
-var clock = new THREE.Clock();
+let clock = new THREE.Clock();
 
-var scene,
+let scene,
   parent,
   renderer,
   camera,
   controls,
   context = {};
-var raycontrol,
+let raycontrol,
   teleport,
   controllers = [];
 
-var listener, ambientMusic;
+let listener, ambientMusic;
 
-var rooms = [
+const rooms = [
   roomHall,
   roomSound,
   roomPhotogrammetryObject,
@@ -112,7 +113,6 @@ const urlObject = new URL(window.location);
 const roomName = urlObject.searchParams.get("room");
 context.room =
   roomNames.indexOf(roomName) !== -1 ? roomNames.indexOf(roomName) : 0;
-// console.log(`Current room "${roomNames[context.room]}", ${context.room}`);
 const debug = urlObject.searchParams.has("debug");
 const handedness = urlObject.searchParams.has("handedness")
   ? urlObject.searchParams.get("handedness")
@@ -136,7 +136,7 @@ const targetPositions = {
   },
 };
 
-function gotoRoom(room) {
+const gotoRoom = (room) =>  {
   rooms[context.room].exit(context);
   raycontrol.deactivateAll();
 
@@ -146,7 +146,7 @@ function gotoRoom(room) {
   if (targetPositions[prevRoom] && targetPositions[prevRoom][nextRoom]) {
     let deltaPosition = new THREE.Vector3();
     const targetPosition = targetPositions[prevRoom][nextRoom];
-    var camera = renderer.xr.getCamera(context.camera);
+    const camera = renderer.xr.getCamera(context.camera);
 
     deltaPosition.x = camera.position.x - targetPosition.x;
     deltaPosition.z = camera.position.z - targetPosition.z;
@@ -161,7 +161,7 @@ function gotoRoom(room) {
   rooms[context.room].enter(context);
 }
 
-function playMusic(room) {
+const playMusic = (room) =>  {
   if (ambientMusic.source) ambientMusic.stop();
 
   const music = musicThemes[room];
@@ -175,27 +175,13 @@ function playMusic(room) {
   ambientMusic.play();
 }
 
-var ecsyWorld;
-var systemsGroup = {};
+const ecsyWorld = new World();
+const systemsGroup = {};
 
-function detectWebXR() {
-  if ("xr" in navigator) {
-    navigator.xr.isSessionSupported("immersive-vr").then((supported) => {
-      if (!supported)
-        document.getElementById("no-webxr").classList.remove("hidden");
-    });
-  } else {
-    document.getElementById("no-webxr").classList.remove("hidden");
-  }
-}
-
-export function init() {
+const init = () =>  {
   document.getElementById(handedness + "hand").classList.add("activehand");
 
   detectWebXR();
-
-  var w = 100;
-  ecsyWorld = new World();
 
   ecsyWorld
     .registerComponent(Object3D)
@@ -255,34 +241,6 @@ export function init() {
   ambientMusic = new THREE.Audio(listener);
 
   controls = new PointerLockControls(camera, renderer.domElement);
-  if (debug) {
-    document.body.addEventListener("click", () => controls.lock());
-    document.body.addEventListener("keydown", (ev) => {
-      switch (ev.keyCode) {
-        case 87:
-          controls.moveForward(0.2);
-          break;
-        case 65:
-          controls.moveRight(-0.2);
-          break;
-        case 83:
-          controls.moveForward(-0.2);
-          break;
-        case 68:
-          controls.moveRight(0.2);
-          break;
-        case 78:
-          gotoRoom((context.room + 1) % rooms.length);
-          break;
-        default: {
-          var room = ev.keyCode - 48;
-          if (!ev.metaKey && room >= 0 && room < rooms.length) {
-            gotoRoom(room);
-          }
-        }
-      }
-    });
-  }
   scene.add(controls.getObject());
 
   parent = new THREE.Object3D();
@@ -308,7 +266,7 @@ export function init() {
 
   scene.add(lightSun, lightFill);
 
-  var cameraRig = new THREE.Group();
+  const cameraRig = new THREE.Group();
   cameraRig.add(camera);
   cameraRig.add(controllers[0]);
   cameraRig.add(controllers[1]);
@@ -386,9 +344,9 @@ export function init() {
   );
 }
 
-function setupControllers() {
-  var model = assets["generic_controller_model"].scene;
-  var material = new THREE.MeshLambertMaterial({
+const setupControllers = () =>  {
+  const model = assets["generic_controller_model"].scene;
+  const material = new THREE.MeshLambertMaterial({
     map: assets["controller_tex"],
   });
   model.getObjectByName("body").material = material;
@@ -410,15 +368,15 @@ function setupControllers() {
 }
 
 // @FIXME Hack for Oculus Browser issue
-var selectStartSkip = {};
-var selectEndSkip = {};
-var OculusBrowser =
+const selectStartSkip = {};
+const selectEndSkip = {};
+const OculusBrowser =
   navigator.userAgent.indexOf("OculusBrowser") !== -1 &&
   parseInt(navigator.userAgent.match(/OculusBrowser\/([0-9]+)./)[1]) < 8;
 
 // <@FIXME
 
-function onSelectStart(ev) {
+const onSelectStart = (ev) =>  {
   // @FIXME Hack for Oculus Browser issue
   if (OculusBrowser) {
     const controller = ev.target;
@@ -435,7 +393,7 @@ function onSelectStart(ev) {
   raycontrol.onSelectStart(ev);
 }
 
-function onSelectEnd(ev) {
+const onSelectEnd = (ev) =>  {
   // @FIXME Hack for Oculus Browser issue
   if (OculusBrowser) {
     const controller = ev.target;
@@ -452,15 +410,15 @@ function onSelectEnd(ev) {
   raycontrol.onSelectEnd(ev);
 }
 
-function onWindowResize() {
+const onWindowResize = () =>  {
   camera.aspect = window.innerWidth / window.innerHeight;
   camera.updateProjectionMatrix();
   renderer.setSize(window.innerWidth, window.innerHeight);
 }
 
-function animate() {
-  var delta = clock.getDelta();
-  var elapsedTime = clock.elapsedTime;
+const animate = () =>  {
+  const delta = clock.getDelta();
+  const elapsedTime = clock.elapsedTime;
 
   ecsyWorld.execute(delta, elapsedTime);
 
@@ -489,3 +447,5 @@ function animate() {
 window.onload = () => {
   init();
 };
+
+export { init };

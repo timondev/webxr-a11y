@@ -1,27 +1,24 @@
 import * as THREE from "three";
 
-var panoBalls = [],
-  panoballsParent = new THREE.Object3D(),
-  bbox = new THREE.Box3(),
-  panoFxMaterial,
-  auxVec = new THREE.Vector3(),
-  hallRef = null;
+const panoBalls = [],
+  panoballsParent = new THREE.Object3D();
+let hallRef = null;
 
 const NUM_PANOBALLS = 6;
 
-export function enter(ctx) {
+const enter = (ctx) =>  {
   ctx.raycontrol.activateState("panoballs");
 }
 
-export function setup(ctx, hall) {
+const setup = (ctx, hall) =>  {
   const assets = ctx.assets;
   hallRef = hall;
 
   const panoGeo = new THREE.SphereGeometry(0.15, 30, 20);
 
-  for (var i = 0; i < NUM_PANOBALLS; i++) {
+  for (let i = 0; i < NUM_PANOBALLS; i++) {
     let asset = assets[`pano${i + 1}small`];
-    var ball = new THREE.Mesh(
+    const ball = new THREE.Mesh(
       new THREE.SphereGeometry(0.15, 30, 20),
       new THREE.ShaderMaterial({
         uniforms: {
@@ -64,14 +61,14 @@ export function setup(ctx, hall) {
   });
 }
 
-export function execute(ctx, delta, time) {
+const execute = (ctx, delta, time) =>  {
   for (let i = 0; i < panoBalls.length; i++) {
     const ball = panoBalls[i];
     ball.position.y = ball.userData.floatY + Math.cos(i + time * 3) * 0.02;
   }
 }
 
-export function updateUniforms(time) {
+const updateUniforms = (time) =>  {
   for (let i = 0; i < panoBalls.length; i++) {
     panoBalls[i].material.uniforms.time.value = i + time;
     panoBalls[i].material.uniforms.selected.value +=
@@ -80,3 +77,5 @@ export function updateUniforms(time) {
       0.1;
   }
 }
+
+export { setup, enter, execute, updateUniforms };

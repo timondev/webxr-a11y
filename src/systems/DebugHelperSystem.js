@@ -8,8 +8,8 @@ import { System, Not } from "ecsy";
 import * as THREE from "three";
 
 THREE.BoxHelper.prototype.setFromMinMax = function (min, max) {
-  var position = this.geometry.attributes.position;
-  var array = position.array;
+  const position = this.geometry.attributes.position;
+  const array = position.array;
 
   array[0] = max.x;
   array[1] = max.y;
@@ -41,11 +41,11 @@ THREE.BoxHelper.prototype.setFromMinMax = function (min, max) {
   this.geometry.computeBoundingSphere();
 };
 
-export class DebugHelperSystem extends System {
+class DebugHelperSystem extends System {
   execute(delta, time) {
     this.queries.added.results.forEach((entity) => {
       entity.addComponent(DebugHelperMesh);
-      var boundingBox = entity.getComponent(BoundingBox);
+      const boundingBox = entity.getComponent(BoundingBox);
       let debugMesh = entity.getMutableComponent(DebugHelperMesh);
       debugMesh.boxHelper.setFromMinMax(boundingBox.min, boundingBox.max);
 
@@ -53,16 +53,7 @@ export class DebugHelperSystem extends System {
     });
 
     this.queries.removed.results.forEach((entity) => {
-      //var boundingBox = entity.getComponent(DebugHelperMesh);
       entity.removeComponent(Object3D).removeComponent(DebugHelperMesh);
-
-      /*
-      entity.addComponent(Object3D, {value: debugMesh.boxHelper});
-
-      let debugMesh = entity.getMutableComponent(DebugHelperMesh);
-      debugMesh.boxHelper.setFromMinMax(boundingBox.min, boundingBox.max);
-      entity.addComponent(Object3D, {value: debugMesh.boxHelper});
-*/
     });
   }
 }
@@ -75,3 +66,5 @@ DebugHelperSystem.queries = {
     components: [Not(DebugHelper), DebugHelperMesh],
   },
 };
+
+export { DebugHelperSystem };
