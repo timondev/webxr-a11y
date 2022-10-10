@@ -36,19 +36,19 @@ export default [
   },
   {
     title: 'The Pink Robe. After the Bath',
-    description: 'Joaquín Sorolla, 1916\n208 x 126.5 cm. Oil on canvas.',
+    description: 'Joaquín Sorolla, 1916\n208 x 126.5 cm. Oil on canvas.'
   },
   {
     title: 'The Garden of Earthly Delights',
-    description: 'Hieronymus Bosch, 1490 - 1510\n205.5 x 384.9 cm. Oil on oak panels.',
+    description: 'Hieronymus Bosch, 1490 - 1510\n205.5 x 384.9 cm. Oil on oak panels.'
   },
   {
     title: 'Self-Portrait',
-    description: 'Rembrandt van Rijn, 1659\n84.5 x 66 cm. Oil on canvas.',
+    description: 'Rembrandt van Rijn, 1659\n84.5 x 66 cm. Oil on canvas.'
   },
   {
     title: 'The Dance Lesson',
-    description: 'Edgar Degas, 1879\n38 x 88 cm. Oil on canvas.',
+    description: 'Edgar Degas, 1879\n38 x 88 cm. Oil on canvas.'
   },
   {
     title: 'Gray Weather, Grande Jatte',
@@ -75,4 +75,4 @@ export default [
     description: 'Aim your controller and press the trigger to teleport around and interact with objects.\n\nWe currently have 3 rooms and 5 experiences to explore. Try them all!',
     offsety: 0.06
   }
-];
+]

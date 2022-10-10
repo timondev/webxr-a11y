@@ -1,95 +1,99 @@
-import * as THREE from "three";
-import { Types } from "ecsy";
+import * as THREE from 'three'
+import { Types } from 'ecsy'
 
 class VectorComponent extends THREE.Vector3 {
-  constructor() {
-    super();
-    this.componentConstructor();
+  constructor () {
+    super()
+    this.componentConstructor()
   }
 
-  componentConstructor(props) {
+  componentConstructor (props) {
     if (props !== false) {
-      const schema = this.constructor.schema;
+      const schema = this.constructor.schema
 
       for (const key in schema) {
+        // eslint-disable-next-line no-prototype-builtins
         if (props && props.hasOwnProperty(key)) {
-          this[key] = props[key];
+          this[key] = props[key]
         } else {
-          const schemaProp = schema[key];
-          if (schemaProp.hasOwnProperty("default")) {
-            this[key] = schemaProp.type.clone(schemaProp.default);
+          const schemaProp = schema[key]
+          // eslint-disable-next-line no-prototype-builtins
+          if (schemaProp.hasOwnProperty('default')) {
+            this[key] = schemaProp.type.clone(schemaProp.default)
           } else {
-            const type = schemaProp.type;
-            this[key] = type.clone(type.default);
+            const type = schemaProp.type
+            this[key] = type.clone(type.default)
           }
         }
       }
 
-      if (process.env.NODE_ENV !== "production" && props !== undefined) {
-        this.checkUndefinedAttributes(props);
+      if (process.env.NODE_ENV !== 'production' && props !== undefined) {
+        this.checkUndefinedAttributes(props)
       }
     }
 
-    this._pool = null;
+    this._pool = null
   }
 
-  copy(source) {
-    const schema = this.constructor.schema;
+  copy (source) {
+    const schema = this.constructor.schema
 
     for (const key in schema) {
-      const prop = schema[key];
+      const prop = schema[key]
 
+      // eslint-disable-next-line no-prototype-builtins
       if (source.hasOwnProperty(key)) {
-        this[key] = prop.type.copy(source[key], this[key]);
+        this[key] = prop.type.copy(source[key], this[key])
       }
     }
 
     // @DEBUG
-    if (process.env.NODE_ENV !== "production") {
-      this.checkUndefinedAttributes(source);
+    if (process.env.NODE_ENV !== 'production') {
+      this.checkUndefinedAttributes(source)
     }
 
-    return this;
+    return this
   }
 
-  clone() {
-    return new this.constructor().copy(this);
+  clone () {
+    return new this.constructor().copy(this)
   }
 
-  reset() {}
+  reset () {}
 
-  dispose() {
+  dispose () {
     if (this._pool) {
-      this._pool.release(this);
+      this._pool.release(this)
     }
   }
 
-  getName() {
-    return this.constructor.getName();
+  getName () {
+    return this.constructor.getName()
   }
 
-  checkUndefinedAttributes(src) {
-    const schema = this.constructor.schema;
+  checkUndefinedAttributes (src) {
+    const schema = this.constructor.schema
 
     // Check that the attributes defined in source are also defined in the schema
     Object.keys(src).forEach((srcKey) => {
+      // eslint-disable-next-line no-prototype-builtins
       if (!schema.hasOwnProperty(srcKey)) {
         console.warn(
           `Trying to set attribute '${srcKey}' not defined in the '${this.constructor.name}' schema. Please fix the schema, the attribute value won't be set`
-        );
+        )
       }
-    });
+    })
   }
 }
 
 VectorComponent.schema = {
   x: { type: Types.Number },
   y: { type: Types.Number },
-  z: { type: Types.Number },
-};
-VectorComponent.isComponent = true;
+  z: { type: Types.Number }
+}
+VectorComponent.isComponent = true
 VectorComponent.getName = function () {
-  return this.displayName || this.name;
-};
+  return this.displayName || this.name
+}
 
-export { VectorComponent };
+export { VectorComponent }

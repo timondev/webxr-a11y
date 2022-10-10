@@ -1,10 +1,10 @@
- /*
+/*
 
-	This is modification of the original VRButton. I've added a callback to know
-	when the user enters and exists from VR
+  This is modification of the original VRButton. I've added a callback to know
+  when the user enters and exists from VR
 
-	Original at:
-	  https://github.com/mrdoob/three.js/blob/dev/examples/jsm/webxr/VRButton.js
+  Original at:
+    https://github.com/mrdoob/three.js/blob/dev/examples/jsm/webxr/VRButton.js
 
  */
 /**
@@ -12,167 +12,136 @@
  * @author Mugen87 / https://github.com/Mugen87
  */
 
-var VRButton = {
+let button
 
-	createButton: function ( renderer, callback ) {
+const VRButton = {
 
-		const showEnterVR = ( /*device*/ ) =>  {
+  createButton: function (renderer, callback) {
+    const showEnterVR = (/* device */) => {
+      let currentSession = null
 
-			var currentSession = null;
+      const onSessionStarted = (session) => {
+        session.addEventListener('end', onSessionEnded)
 
-			const onSessionStarted = ( session ) =>  {
+        renderer.xr.setSession(session)
+        button.textContent = 'EXIT VR'
 
-				session.addEventListener( 'end', onSessionEnded );
+        currentSession = session
 
-				renderer.xr.setSession( session );
-				button.textContent = 'EXIT VR';
+        callback(null, 'sessionStarted')
+      }
 
-				currentSession = session;
+      const onSessionEnded = (/* event */) => {
+        currentSession.removeEventListener('end', onSessionEnded)
 
-				callback('sessionStarted');
-			}
+        button.textContent = 'ENTER VR'
 
-			const onSessionEnded = ( /*event*/ ) =>  {
+        currentSession = null
 
-				currentSession.removeEventListener( 'end', onSessionEnded );
+        callback(null, 'sessionEnded')
+      }
 
-				button.textContent = 'ENTER VR';
+      //
 
-				currentSession = null;
+      button.style.display = ''
 
-				callback('sessionEnded');
-			}
+      button.style.cursor = 'pointer'
+      button.style.left = 'calc(50% - 50px)'
+      button.style.width = '100px'
 
+      button.textContent = 'ENTER VR'
 
-			//
+      button.onmouseenter = function () {
+        button.style.opacity = '1.0'
+      }
 
-			button.style.display = '';
+      button.onmouseleave = function () {
+        button.style.opacity = '0.5'
+      }
 
-			button.style.cursor = 'pointer';
-			button.style.left = 'calc(50% - 50px)';
-			button.style.width = '100px';
+      button.onclick = function () {
+        if (currentSession === null) {
+          // WebXR's requestReferenceSpace only works if the corresponding feature
+          // was requested at session creation time. For simplicity, just ask for
+          // the interesting ones as optional features, but be aware that the
+          // requestReferenceSpace call will fail if it turns out to be unavailable.
+          // ('local' is always available for immersive sessions and doesn't need to
+          // be requested separately.)
 
-			button.textContent = 'ENTER VR';
+          const sessionInit = { optionalFeatures: ['local-floor', 'bounded-floor'] }
+          navigator.xr.requestSession('immersive-vr', sessionInit).then(onSessionStarted)
+        } else {
+          currentSession.end()
+        }
+      }
+    }
 
-			button.onmouseenter = function () {
+    const disableButton = () => {
+      button.style.display = ''
 
-				button.style.opacity = '1.0';
+      button.style.cursor = 'auto'
+      button.style.left = 'calc(50% - 75px)'
+      button.style.width = '150px'
 
-			};
+      button.onmouseenter = null
+      button.onmouseleave = null
 
-			button.onmouseleave = function () {
+      button.onclick = null
+    }
 
-				button.style.opacity = '0.5';
+    const showWebXRNotFound = () => {
+      disableButton()
 
-			};
+      button.textContent = 'VR NOT SUPPORTED'
+    }
 
-			button.onclick = function () {
+    const stylizeElement = (element) => {
+      element.style.position = 'absolute'
+      element.style.bottom = '20px'
+      element.style.padding = '12px 6px'
+      element.style.border = '1px solid #fff'
+      element.style.borderRadius = '4px'
+      element.style.background = 'rgba(0,0,0,0.1)'
+      element.style.color = '#fff'
+      element.style.font = 'normal 13px sans-serif'
+      element.style.textAlign = 'center'
+      element.style.opacity = '0.5'
+      element.style.outline = 'none'
+      element.style.zIndex = '999'
+    }
 
-				if ( currentSession === null ) {
+    if ('xr' in navigator) {
+      button = document.createElement('button')
+      button.style.display = 'none'
 
-					// WebXR's requestReferenceSpace only works if the corresponding feature
-					// was requested at session creation time. For simplicity, just ask for
-					// the interesting ones as optional features, but be aware that the
-					// requestReferenceSpace call will fail if it turns out to be unavailable.
-					// ('local' is always available for immersive sessions and doesn't need to
-					// be requested separately.)
+      stylizeElement(button)
 
-					var sessionInit = { optionalFeatures: [ 'local-floor', 'bounded-floor' ] };
-					navigator.xr.requestSession( 'immersive-vr', sessionInit ).then( onSessionStarted );
+      navigator.xr.isSessionSupported('immersive-vr').then(function (supported) {
+        supported ? showEnterVR() : showWebXRNotFound()
+      })
 
-				} else {
+      return button
+    } else {
+      const message = document.createElement('a')
 
-					currentSession.end();
+      if (window.isSecureContext === false) {
+        message.href = document.location.href.replace(/^http:/, 'https:')
+        message.innerHTML = 'WEBXR NEEDS HTTPS' // TODO Improve message
+      } else {
+        message.href = 'https://immersiveweb.dev/'
+        message.innerHTML = 'WEBXR NOT AVAILABLE'
+      }
 
-				}
+      message.style.left = 'calc(50% - 90px)'
+      message.style.width = '180px'
+      message.style.textDecoration = 'none'
 
-			};
+      stylizeElement(message)
 
-		}
+      return message
+    }
+  }
 
-		const disableButton = () =>  {
+}
 
-			button.style.display = '';
-
-			button.style.cursor = 'auto';
-			button.style.left = 'calc(50% - 75px)';
-			button.style.width = '150px';
-
-			button.onmouseenter = null;
-			button.onmouseleave = null;
-
-			button.onclick = null;
-
-		}
-
-		const showWebXRNotFound = () =>  {
-
-			disableButton();
-
-			button.textContent = 'VR NOT SUPPORTED';
-
-		}
-
-		const stylizeElement = ( element ) =>  {
-
-			element.style.position = 'absolute';
-			element.style.bottom = '20px';
-			element.style.padding = '12px 6px';
-			element.style.border = '1px solid #fff';
-			element.style.borderRadius = '4px';
-			element.style.background = 'rgba(0,0,0,0.1)';
-			element.style.color = '#fff';
-			element.style.font = 'normal 13px sans-serif';
-			element.style.textAlign = 'center';
-			element.style.opacity = '0.5';
-			element.style.outline = 'none';
-			element.style.zIndex = '999';
-
-		}
-
-		if ( 'xr' in navigator ) {
-
-			var button = document.createElement( 'button' );
-			button.style.display = 'none';
-
-			stylizeElement( button );
-
-			navigator.xr.isSessionSupported( 'immersive-vr' ).then( function ( supported ) {
-
-				supported ? showEnterVR() : showWebXRNotFound();
-
-			} );
-
-			return button;
-
-		} else {
-
-			var message = document.createElement( 'a' );
-
-			if ( window.isSecureContext === false ) {
-
-				message.href = document.location.href.replace( /^http:/, 'https:' );
-				message.innerHTML = 'WEBXR NEEDS HTTPS'; // TODO Improve message
-
-			} else {
-
-				message.href = 'https://immersiveweb.dev/';
-				message.innerHTML = 'WEBXR NOT AVAILABLE';
-
-			}
-
-			message.style.left = 'calc(50% - 90px)';
-			message.style.width = '180px';
-			message.style.textDecoration = 'none';
-
-			stylizeElement( message );
-
-			return message;
-
-		}
-
-	}
-
-};
-
-export { VRButton };
+export { VRButton }

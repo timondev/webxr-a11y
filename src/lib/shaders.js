@@ -131,7 +131,7 @@ void main( void ) {
   col *= vUv.y;
   gl_FragColor = col;
 }
-`,
-};
+`
+}
 
-export { shaders };
+export { shaders }
