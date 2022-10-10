@@ -42,7 +42,7 @@ export function setup(ctx) {
       fontSize: 0.02,
       anchor: "left",
       textAlign: "left",
-      baseline: "center",
+      baseline: "top",
       maxWidth: 0.34,
       lineHeight: 1.3,
       text: DATA[i],
