@@ -1,7 +1,6 @@
-import * as THREE from 'three';
+import * as THREE from "three";
 
-var
-  panoBalls = [],
+var panoBalls = [],
   panoballsParent = new THREE.Object3D(),
   bbox = new THREE.Box3(),
   panoFxMaterial,
@@ -11,25 +10,25 @@ var
 const NUM_PANOBALLS = 6;
 
 export function enter(ctx) {
-  ctx.raycontrol.activateState('panoballs');
+  ctx.raycontrol.activateState("panoballs");
 }
 
 export function setup(ctx, hall) {
   const assets = ctx.assets;
   hallRef = hall;
 
-  const panoGeo = new THREE.SphereBufferGeometry(0.15, 30, 20);
+  const panoGeo = new THREE.SphereGeometry(0.15, 30, 20);
 
   for (var i = 0; i < NUM_PANOBALLS; i++) {
     let asset = assets[`pano${i + 1}small`];
     var ball = new THREE.Mesh(
-      new THREE.SphereBufferGeometry(0.15, 30, 20),
+      new THREE.SphereGeometry(0.15, 30, 20),
       new THREE.ShaderMaterial({
         uniforms: {
-          time: {value: 0},
-          tex: {value: asset},
-          texfx: {value: assets['panoballfx_tex']},
-          selected: {value: 0}
+          time: { value: 0 },
+          tex: { value: asset },
+          texfx: { value: assets["panoballfx_tex"] },
+          selected: { value: 0 },
         },
         vertexShader: ctx.shaders.panoball_vert,
         fragmentShader: ctx.shaders.panoball_frag,
@@ -48,21 +47,20 @@ export function setup(ctx, hall) {
 
   hall.add(panoballsParent);
 
-  ctx.raycontrol.addState('panoballs', {
+  ctx.raycontrol.addState("panoballs", {
     colliderMesh: panoballsParent,
     onHover: (intersection, active, controller) => {
-      panoBalls.forEach(panoBall => panoBall.userData.selected = 0);
+      panoBalls.forEach((panoBall) => (panoBall.userData.selected = 0));
       intersection.object.userData.selected = 1;
     },
     onHoverLeave: (intersection) => {
       intersection.object.userData.selected = 0;
     },
-    onSelectStart: (intersection, controller) => {
-    },
+    onSelectStart: (intersection, controller) => {},
     onSelectEnd: (intersection) => {
       ctx.goto = intersection.object.userData.panoId;
       intersection.object.userData.selected = 0;
-    }
+    },
   });
 }
 
@@ -77,6 +75,8 @@ export function updateUniforms(time) {
   for (let i = 0; i < panoBalls.length; i++) {
     panoBalls[i].material.uniforms.time.value = i + time;
     panoBalls[i].material.uniforms.selected.value +=
-      (panoBalls[i].userData.selected - panoBalls[i].material.uniforms.selected.value) * 0.1;
+      (panoBalls[i].userData.selected -
+        panoBalls[i].material.uniforms.selected.value) *
+      0.1;
   }
 }

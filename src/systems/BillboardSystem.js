@@ -22,7 +22,11 @@ export default class BillboardSystem extends System {
       let opacity = 0;
 
       if (distance < SHOW_DISTANCE) {
-        opacity = THREE.Math.clamp(Math.sqrt(SHOW_DISTANCE - distance), 0, 1);
+        opacity = THREE.MathUtils.clamp(
+          Math.sqrt(SHOW_DISTANCE - distance),
+          0,
+          1
+        );
         object3D.lookAt(cameraPosition);
       }
 

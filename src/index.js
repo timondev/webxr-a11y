@@ -236,7 +236,6 @@ export function init() {
     antialias: true,
     logarithmicDepthBuffer: false,
   });
-  renderer.gammaFactor = 2.2;
   renderer.outputEncoding = THREE.sRGBEncoding;
   renderer.setPixelRatio(window.devicePixelRatio);
   renderer.setSize(window.innerWidth, window.innerHeight);
