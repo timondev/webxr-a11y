@@ -3,7 +3,7 @@ import { PointerLockControls } from "three/examples/jsm/controls/PointerLockCont
 
 import { VRButton } from "./lib/VRButton.js";
 import { slideshow } from "./lib/slideshow.js";
-import { loadAssets } from "./lib/assetManager.js";
+import { loadAsset, loadAssets } from "./lib/assetManager.js";
 
 // ECSY
 import { World } from "ecsy";
@@ -54,7 +54,10 @@ import { shaders } from "./lib/shaders.js";
 
 import WebXRPolyfill from "webxr-polyfill";
 import { detectWebXR } from "./lib/utils.js";
+import { fetchProfile } from "@webxr-input-profiles/motion-controllers";
 const polyfill = new WebXRPolyfill();
+
+const DEBUG = true;
 
 let clock = new THREE.Clock();
 
@@ -62,6 +65,7 @@ let scene,
   parent,
   renderer,
   camera,
+  spectator,
   controls,
   context = {};
 let raycontrol,
@@ -238,6 +242,14 @@ const init = () =>  {
   listener = new THREE.AudioListener();
   camera.add(listener);
 
+  spectator = new THREE.PerspectiveCamera(
+    80,
+    window.innerWidth / window.innerHeight,
+    0.005,
+    10000
+  );
+  spectator.position.set(0, 1.6, 0);
+
   ambientMusic = new THREE.Audio(listener);
 
   controls = new PointerLockControls(camera, renderer.domElement);
@@ -279,6 +291,7 @@ const init = () =>  {
   context.scene = parent;
   context.renderer = renderer;
   context.camera = camera;
+  context.spectator = spectator;
   context.audioListener = listener;
   context.goto = null;
   context.cameraRig = cameraRig;
@@ -302,7 +315,7 @@ const init = () =>  {
       teleport = new Teleport(context);
       context.teleport = teleport;
 
-      setupControllers();
+      setupControllers(renderer);
       roomHall.setup(context);
       roomPanorama.setup(context);
       roomPanoramaStereo.setup(context);
@@ -344,25 +357,20 @@ const init = () =>  {
   );
 }
 
-const setupControllers = () =>  {
-  const model = assets["generic_controller_model"].scene;
-  const material = new THREE.MeshLambertMaterial({
-    map: assets["controller_tex"],
-  });
-  model.getObjectByName("body").material = material;
-  model.getObjectByName("trigger").material = material;
-
+const setupControllers = async (renderer) =>  {
   for (let i = 0; i < 2; i++) {
     let controller = controllers[i];
     controller.boundingBox = new THREE.Box3();
     controller.userData.grabbing = null;
-    controller.addEventListener("connected", function (event) {
-      this.add(model.clone());
-      raycontrol.addController(this, event.data);
+    controller.addEventListener("connected", async (event) => {
+      const { profile, assetPath } = await fetchProfile(event.data, '/profiles')
+      const asset = await loadAsset(renderer, { url: assetPath })
+      controller.add(asset.scene.clone());
+      raycontrol.addController(controller, event.data);
     });
-    controller.addEventListener("disconnect", function () {
-      this.remove(this.children[0]);
-      raycontrol.removeController(this, event.data);
+    controller.addEventListener("disconnect", async () => {
+      controller.remove(controller.children[0]);
+      raycontrol.removeController(controller, event.data);
     });
   }
 }
@@ -414,6 +422,11 @@ const onWindowResize = () =>  {
   camera.aspect = window.innerWidth / window.innerHeight;
   camera.updateProjectionMatrix();
   renderer.setSize(window.innerWidth, window.innerHeight);
+
+  if (DEBUG) {
+    spectator.aspect = window.innerWidth / window.innerHeight;
+    spectator.updateProjectionMatrix();
+  }
 }
 
 const animate = () =>  {
@@ -441,6 +454,25 @@ const animate = () =>  {
   if (context.goto !== null) {
     gotoRoom(context.goto);
     context.goto = null;
+  }
+
+  if (DEBUG && renderer.xr.isPresenting) {
+    const xrCamera = renderer.xr.getCamera(camera)
+
+    spectator.projectionMatrix.copy(camera.projectionMatrix);
+    spectator.position.copy(xrCamera.position);
+    spectator.quaternion.copy(xrCamera.quaternion);
+
+    const currentRenderTarget = renderer.getRenderTarget();
+
+    renderer.xr.isPresenting = false;
+    // render to the canvas on our main display
+    renderer.setRenderTarget(null);
+    renderer.render(scene, spectator);
+
+    // reset back to enable WebXR
+    renderer.setRenderTarget(currentRenderTarget);
+    renderer.xr.isPresenting = true;
   }
 }
 

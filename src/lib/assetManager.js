@@ -28,6 +28,66 @@ const allAssetsLoaded = (assets) =>  {
   return true;
 }
 
+const loadAsset = async (
+  renderer,
+  asset
+) => {
+  const basisLoader = new BasisTextureLoader();
+  basisLoader.setTranscoderPath(BASIS_LIB_PATH);
+  basisLoader.detectSupport(renderer);
+
+  const gltfLoader = new GLTFLoader();
+  const dracoLoader = new DRACOLoader();
+  dracoLoader.setDecoderPath(DRACO_LIB_PATH);
+  gltfLoader.setDRACOLoader(dracoLoader);
+
+  const texLoader = new THREE.TextureLoader();
+  const objLoader = new OBJLoader();
+  const fontLoader = new FontLoader();
+  const audioLoader = new THREE.AudioLoader();
+
+  const loaders = {
+    gltf: gltfLoader,
+    glb: gltfLoader,
+    obj: objLoader,
+    gif: texLoader,
+    png: texLoader,
+    jpg: texLoader,
+    basis: basisLoader,
+    font: fontLoader,
+    ogg: audioLoader,
+  };
+
+  let assetPath = asset.url;
+  let ext = assetPath.substr(assetPath.lastIndexOf(".") + 1).toLowerCase();
+
+  return new Promise((resolve) => { loaders[ext].load(
+    assetPath,
+    (loadedAsset) => {
+      const options = asset.options;
+      asset = ext == "font" ? loadedAsset.data : loadedAsset;
+
+      if (typeof options !== "undefined") {
+        if (typeof options.repeat !== "undefined") {
+          asset.repeat.set(options.repeat[0], options.repeat[1]);
+          delete options.repeat;
+        }
+        for (let opt in options) {
+          asset[opt] = options[opt];
+        }
+      }
+
+      resolve(asset)
+    },
+    () => {
+      /* on progress */
+    },
+    (e) => {
+      console.error("Error loading asset", e);
+    }
+  )});
+}
+
 function loadAssets(
   renderer,
   basePath,
@@ -108,4 +168,4 @@ function loadAssets(
   }
 }
 
-export { loadAssets };
+export { loadAsset, loadAssets };

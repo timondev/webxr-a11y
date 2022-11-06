@@ -29,6 +29,8 @@
   },
   "homepage": "https://github.com/timondev/webxr-a11y#readme",
   "dependencies": {
+    "@webxr-input-profiles/assets": "^1.0.12",
+    "@webxr-input-profiles/motion-controllers": "^1.0.0",
     "ecsy": "^0.4.2",
     "three": "^0.145.0",
     "three-obj-loader": "^1.1.3",
