@@ -160,6 +160,7 @@ const exit = (ctx) =>  {
   ctx.raycontrol.deactivateState("teleport");
 
   xylophone.exit(ctx);
+  graffiti.exit(ctx);
 }
 
 const execute = (ctx, delta, time) =>  {

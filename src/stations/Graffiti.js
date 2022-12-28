@@ -10,6 +10,7 @@ import {
   DebugHelper,
 } from "../components";
 import { angleBetween, getRandomInt } from "../lib/utils.js";
+import { speak } from "../lib/accessibility";
 
 let colorWheel;
 
@@ -22,7 +23,7 @@ const enter = (ctx) =>  {
 
 let material, wall, drawContext;
 let lastPosition = new THREE.Vector2();
-let brushImg, canvasTmp, ctxTmp;
+let brushImg, canvasTmp, ctxTmp, drawingCanvas;
 
 let lastController;
 let paintImg = new Image();
@@ -37,7 +38,7 @@ const colorize = (r, g, b) =>  {
     imgData.data[t + 2] = (b * imgData.data[t + 2]) / 255;
   }
   ctxTmp.putImageData(imgData, 0, 0);
-  paintImg.src = canvasTmp.toDataURL();
+  paintImg = canvasTmp.transferToImageBitmap();
 }
 
 const setup = (ctx, hall) =>  {
@@ -57,7 +58,7 @@ const setup = (ctx, hall) =>  {
   let checkerSpray = ctx.world.createEntity();
   let spray = ctx.assets["spray_model"].scene;
 
-  const attachSprayCan = (controllerData) =>  {
+  const attachSprayCan = (ctx, controllerData) =>  {
     let controller = controllerData.controller;
     const handedness = controllerData.inputSource.handedness;
     let listener = new THREE.AudioListener();
@@ -68,7 +69,7 @@ const setup = (ctx, hall) =>  {
     audioLoader.load("assets/ogg/spray.ogg", (buffer) => {
       sound.setBuffer(buffer);
       sound.name = "spraySound";
-      controller.add(sound);
+      ctx.raycontrol.addAttachement("spraySound", controller, sound);
     });
 
     spray
@@ -82,24 +83,26 @@ const setup = (ctx, hall) =>  {
     });
     spray.getObjectByName("spraycolor").material =
       new THREE.MeshLambertMaterial({ color: 0xff0000 });
-    controller.add(spray);
+    ctx.raycontrol.addAttachement("sprayCan", controller, spray);
   }
 
-  const attachColorWheel = (controllerData) =>  {
-    let controller = controllerData.controller;
-    colorWheel = new ColorWheel(ctx, controller, (rgb) => {
-      colorize(rgb.r, rgb.g, rgb.b);
-      spray
-        .getObjectByName("spraycolor")
-        .material.color.setRGB(rgb.r / 255, rgb.g / 255, rgb.b / 255);
-    });
+  // const attachColorWheel = (controllerData) =>  {
+  //   let controller = controllerData.controller;
+  //   colorWheel = new ColorWheel(ctx, controller, (rgb) => {
+  //     colorize(rgb.r, rgb.g, rgb.b);
+  //     spray
+  //       .getObjectByName("spraycolor")
+  //       .material.color.setRGB(rgb.r / 255, rgb.g / 255, rgb.b / 255);
+  //   });
 
-    colorWheel.enter();
-  }
+  //   colorWheel.enter();
+  // }
 
   ctx.raycontrol.addEventListener("controllerConnected", (controllerData) => {
-    if (ctx.raycontrol.matchController(controllerData, "primary")) {
-      attachSprayCan(controllerData);
+    if (ctx.raycontrol.matchController(controllerData, "secondary")) {
+      if(ctx.raycontrol.hasAttachment("sprayCan")) return;
+
+      attachSprayCan(ctx, controllerData);
       checkerSpray
         .addComponent(AreaChecker)
         .addComponent(Object3D, { value: controllerData.controller })
@@ -119,6 +122,7 @@ const setup = (ctx, hall) =>  {
             raycasterContext.position.set(0, -0.015, -0.025);
             ctx.raycontrol.setLineStyle("basic");
             ctx.raycontrol.activateState("graffiti");
+            speak('enter_graffiti');
           },
           onExiting: (entity) => {
             const obj3D = entity.getComponent(Object3D).value;
@@ -129,44 +133,50 @@ const setup = (ctx, hall) =>  {
             raycasterContext.position.set(0, 0, 0);
             ctx.raycontrol.setLineStyle("advanced");
             ctx.raycontrol.deactivateState("graffiti");
+            speak('exit_graffiti');
           },
         });
     } else {
-      attachColorWheel(controllerData);
-      checker
-        .addComponent(AreaChecker)
-        .addComponent(Object3D, { value: controllerData.controller })
-        .addComponent(AreaReactor, {
-          onEntering: (entity) => {
-            const obj3D = entity.getComponent(Object3D).value;
-            obj3D.getObjectByName("Scene").visible = false;
-            obj3D.getObjectByName("ColorWheel").visible = true;
-          },
-          onExiting: (entity) => {
-            const obj3D = entity.getComponent(Object3D).value;
-            obj3D.getObjectByName("Scene").visible = true;
-            obj3D.getObjectByName("ColorWheel").visible = false;
-          },
-        });
+      if(ctx.raycontrol.hasAttachment("colorWheel")) return;
+
+      // attachColorWheel(controllerData);
+      // checker
+      //   .addComponent(AreaChecker)
+      //   .addComponent(Object3D, { value: controllerData.controller })
+      //   .addComponent(AreaReactor, {
+      //     onEntering: (entity) => {
+      //       const obj3D = entity.getComponent(Object3D).value;
+      //       obj3D.getObjectByName("Scene").visible = false;
+      //       obj3D.getObjectByName("ColorWheel").visible = true;
+      //     },
+      //     onExiting: (entity) => {
+      //       const obj3D = entity.getComponent(Object3D).value;
+      //       obj3D.getObjectByName("Scene").visible = true;
+      //       obj3D.getObjectByName("ColorWheel").visible = false;
+      //     },
+      //   });
     }
   });
 
   let width = 2048;
   let height = 1024;
-  let maxDistance = 1;
+  let maxDistance = 1.5;
 
   brushImg = new Image();
-  canvasTmp = document.createElement("canvas");
-  ctxTmp = canvasTmp.getContext("2d");
+  canvasTmp = new window.OffscreenCanvas(512, 512);
+  ctxTmp = canvasTmp.getContext("2d", { desynchronized: true, willReadFrequently: true });
 
   brushImg.onload = () => {
     canvasTmp.width = brushImg.width;
     canvasTmp.height = brushImg.height;
+
+    ctxTmp.clearRect(0, 0, canvasTmp.width, canvasTmp.height);
+    ctxTmp.drawImage(brushImg, 0, 0);
     colorize(0, 0, 0);
   };
   brushImg.src = "assets/spray_brush.png";
 
-  const drawingCanvas = document.createElement("canvas");
+  drawingCanvas = document.createElement("canvas");
 
   drawingCanvas.width = width;
   drawingCanvas.height = height;
@@ -174,6 +184,18 @@ const setup = (ctx, hall) =>  {
   drawContext.clearRect(0, 0, width, height);
   drawContext.fillStyle = "#fff";
   drawContext.fillRect(0, 0, width, height);
+
+  if(window.localStorage != null) {
+    const dataURL = localStorage.getItem('graffitiCanvas');
+
+    if(dataURL != null) {
+      let tmpImage = new Image();
+      tmpImage.src = dataURL;
+      tmpImage.onload = () => {
+        drawContext.drawImage(tmpImage, 0, 0);
+      };
+    }
+  }
 
   let map = new THREE.CanvasTexture(drawingCanvas);
 
@@ -190,6 +212,7 @@ const setup = (ctx, hall) =>  {
 
   ctx.raycontrol.addState("graffiti", {
     colliderMesh: wall,
+    controller: 'secondary',
     lineStyleOnIntersection: "basic",
     onHover: (intersection, active, controller) => {
       if (active) {
@@ -262,4 +285,10 @@ const setup = (ctx, hall) =>  {
 
 const execute = (ctx, delta, time) =>  {}
 
-export { setup, enter, execute };
+const exit = (ctx) => {
+  if(window.localStorage != null) {
+    window.localStorage.setItem('graffitiCanvas', drawingCanvas.toDataURL());
+  }
+}
+
+export { setup, enter, execute, exit };

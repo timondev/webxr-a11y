@@ -14,7 +14,7 @@
 
 var VRButton = {
 
-	createButton: function ( renderer, callback ) {
+	createButton: function ( renderer, callback, exitCallback ) {
 
 		const showEnterVR = ( /*device*/ ) =>  {
 
@@ -48,23 +48,12 @@ var VRButton = {
 
 			button.style.display = '';
 
-			button.style.cursor = 'pointer';
-			button.style.left = 'calc(50% - 50px)';
-			button.style.width = '100px';
+			// button.style.cursor = 'pointer';
+			// button.style.left = 'calc(50% - 50px)';
+			// button.style.width = '100px';
 
 			button.textContent = 'ENTER VR';
-
-			button.onmouseenter = function () {
-
-				button.style.opacity = '1.0';
-
-			};
-
-			button.onmouseleave = function () {
-
-				button.style.opacity = '0.5';
-
-			};
+			button.tabIndex = "4";
 
 			button.onclick = function () {
 
@@ -83,6 +72,7 @@ var VRButton = {
 				} else {
 
 					currentSession.end();
+					exitCallback();
 
 				}
 
@@ -93,10 +83,7 @@ var VRButton = {
 		const disableButton = () =>  {
 
 			button.style.display = '';
-
-			button.style.cursor = 'auto';
-			button.style.left = 'calc(50% - 75px)';
-			button.style.width = '150px';
+			button.disabled = true;
 
 			button.onmouseenter = null;
 			button.onmouseleave = null;
@@ -113,29 +100,13 @@ var VRButton = {
 
 		}
 
-		const stylizeElement = ( element ) =>  {
-
-			element.style.position = 'absolute';
-			element.style.bottom = '20px';
-			element.style.padding = '12px 6px';
-			element.style.border = '1px solid #fff';
-			element.style.borderRadius = '4px';
-			element.style.background = 'rgba(0,0,0,0.1)';
-			element.style.color = '#fff';
-			element.style.font = 'normal 13px sans-serif';
-			element.style.textAlign = 'center';
-			element.style.opacity = '0.5';
-			element.style.outline = 'none';
-			element.style.zIndex = '999';
-
-		}
-
 		if ( 'xr' in navigator ) {
 
 			var button = document.createElement( 'button' );
+			button.classList.add('xr-button');
 			button.style.display = 'none';
 
-			stylizeElement( button );
+			// stylizeElement( button );
 
 			navigator.xr.isSessionSupported( 'immersive-vr' ).then( function ( supported ) {
 

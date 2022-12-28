@@ -32,6 +32,7 @@ const setup = (ctx, hall) =>  {
         side: THREE.BackSide,
       })
     );
+    ball.name = `panoballmesh${i + 1}`;
     ball.rotation.set(Math.PI, 0, 0);
     ball.position.copy(hall.getObjectByName(`panoball${i + 1}`).position);
     ball.userData.floatY = ball.position.y;

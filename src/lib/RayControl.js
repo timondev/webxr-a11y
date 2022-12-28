@@ -1,9 +1,11 @@
+import { Constants, MotionController } from '@webxr-input-profiles/motion-controllers'
 import * as THREE from 'three'
 import { Matrix4 } from 'three'
 import { Frustum } from 'three'
 import { objects } from '../objects.js'
+import { readRoom } from './a11y.js'
 import { EventDispatcher } from './EventDispatcher.js'
-import { getObjectDescription, requestTextToBeSpoken } from './utils.js'
+import { getObjectDescription, requestTextToBeSpoken, sanitizedID } from './utils.js'
 
 const tempMatrix = new THREE.Matrix4()
 let rayMaterial
@@ -42,6 +44,24 @@ class RayControl extends EventDispatcher {
 
       this.dispatchEvent('handednessChanged', { primary: this.primary, secondary: this.secondary })
     }
+  }
+
+  hasAttachment (name) {
+    this.attachements[name] !== null;
+  }
+
+  addAttachement (name, controller, scene) {
+    this.attachements[name] = true;
+    controller.add(scene);
+  }
+
+  removeAttachement (name, controllerData, scene) {
+    delete this.attachements[name];
+    controllerData.controller.remove(scene);
+  }
+
+  addControllerEventListener(name, modifiers, cooldown, instantReset, eventListener) {
+    this.controllerEvents[name] = { modifiers, callback: eventListener, cooldown, activeCooldown: 0, instantReset };
   }
 
   addState (name, state, activate) {
@@ -101,7 +121,7 @@ class RayControl extends EventDispatcher {
     this._sort()
   }
 
-  addController (controller, inputSource) {
+  addController (controller, inputSource, { profile, assetPath, asset }) {
     const controllerData = {
       controller,
       inputSource,
@@ -109,13 +129,28 @@ class RayControl extends EventDispatcher {
       stateHit: {},
       intersections: {},
       currentIntersection: null,
+      previousControllerStates: {},
+      motionController: new MotionController(inputSource, profile, assetPath),
       hit: false
     }
+
+    this.addTouchPointDots(controllerData.motionController, asset);
+
+    // FIX HP Controller
+    if(profile.profileId === 'hp-mixed-reality') {
+      asset.scene.rotation.x += Math.PI / 8.0;
+    }
+
+    controller.add(asset.scene);
 
     this.controllers.push(controllerData)
 
     if (this.matchController(controllerData, 'primary')) {
       controller.add(this.raycasterContext)
+    }
+
+    if (this.matchController(controllerData, 'secondary')) {
+      controller.add(this.secondaryRayCasterContext);
     }
 
     this.dispatchEvent('controllerConnected', controllerData)
@@ -126,6 +161,53 @@ class RayControl extends EventDispatcher {
     const controllerData = this.controllers.find(controllerData => controllerData.controller === controller)
     this.controllers.splice(index, 1)
     this.dispatchEvent('controllerDisconnected', controllerData)
+  }
+
+  addTouchPointDots(motionController, asset) {
+    Object.values(motionController.components).forEach((component) => {
+      if (component.touchPointNodeName) {
+        const touchPointRoot = asset.getObjectByName(component.touchPointNodeName);
+
+        const sphereGeometry = new THREE.SphereGeometry(0.001);
+        const material = new THREE.MeshBasicMaterial({ color: 0x0000FF });
+        const touchPointDot = new THREE.Mesh(sphereGeometry, material);
+        touchPointRoot.add(touchPointDot);
+      }
+    });
+  }
+
+  updateMotionControllerModel(motionController, controllerRoot) {
+    Object.values(motionController.components).forEach((component) => {
+      Object.values(component.visualResponses).forEach((visualResponse) => {
+        // Find the topmost node in the visualization
+        const valueNode = controllerRoot.getObjectByName(visualResponse.valueNodeName);
+  
+        // Calculate the new properties based on the weight supplied
+        if (visualResponse.valueNodeProperty === 'visibility') {
+          valueNode.visible = visualResponse.value;
+        } else if (visualResponse.valueNodeProperty === 'transform') {
+          const minNode = controllerRoot.getObjectByName(visualResponse.minNodeName);
+          const maxNode = controllerRoot.getObjectByName(visualResponse.maxNodeName);
+
+          if(visualResponse.value < 0 || visualResponse.value > 1) {
+            return;
+          }
+
+          valueNode.quaternion.slerpQuaternions(
+            minNode.quaternion,
+            maxNode.quaternion,
+            visualResponse.value
+          );
+  
+          valueNode.position.lerpVectors(
+            minNode.position,
+            maxNode.position,
+            visualResponse.value
+          );
+        }
+      });
+    })
+
   }
 
   constructor (ctx, primary) {
@@ -147,6 +229,8 @@ class RayControl extends EventDispatcher {
     this.raycaster = new THREE.Raycaster()
     this.states = {}
     this.currentStates = []
+    this.attachements = {}
+    this.controllerEvents = {}
 
     const line = ctx.assets.teleport_model.scene.getObjectByName('beam')
 
@@ -170,20 +254,28 @@ class RayControl extends EventDispatcher {
     this.rayLength = 5
     line.scale.z = this.rayLength
 
-    this.line0 = line.clone()
-    this.line0.visible = true
+    this.line0 = line.clone();
+    this.line0.visible = true;
+
+    this.secondaryLine0 = line.clone();
+    this.secondaryLine0.visible = false;
 
     this.raycasterContext = new THREE.Group()
     this.raycasterContext.add(this.line0)
     this.raycasterContext.name = 'raycasterContext'
 
-    const geometry = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, 0, -1)])
+    this.secondaryRayCasterContext = new THREE.Group()
+    this.secondaryRayCasterContext.add(this.secondaryLine0)
+    this.secondaryRayCasterContext.name = 'raycasterContext'
 
-    this.lineBasic = new THREE.Line(geometry)
-    this.lineBasic.name = 'line'
-    this.lineBasic.scale.z = 5
-    this.lineBasic.visible = false
-    this.raycasterContext.add(this.lineBasic)
+    const geometry = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, 0, -1)]);
+
+    this.lineBasic = new THREE.Line(geometry);
+    this.lineBasic.name = 'line';
+    this.lineBasic.scale.z = 5;
+    this.lineBasic.visible = false;
+    this.raycasterContext.add(this.lineBasic);
+    this.secondaryRayCasterContext.add(this.lineBasic.clone());
   }
 
   setLineStyle (lineStyle) {
@@ -238,6 +330,13 @@ class RayControl extends EventDispatcher {
     for (let c = 0; c < this.controllers.length; c++) {
       const controllerData = this.controllers[c]
 
+      // update motion controller
+      const motionController = controllerData.motionController
+      motionController.updateFromGamepad()
+
+      // update visual controller
+      this.updateMotionControllerModel(motionController, controllerData.controller)
+
       for (let i = 0; i < this.currentStates.length; i++) {
         const state = this.currentStates[i]
         if (!state.raycaster) {
@@ -259,9 +358,6 @@ class RayControl extends EventDispatcher {
         } else {
           controllerData.intersections[state.name] = null
         }
-
-          controllerData.intersections[state.name] = null;
-        }
       }
     }
 
@@ -272,6 +368,36 @@ class RayControl extends EventDispatcher {
     for (let c = 0; c < this.controllers.length; c++) {
       const controllerData = this.controllers[c]
       const intersections = Object.entries(controllerData.intersections).filter(i => i[1] !== null)
+
+      const motionController = controllerData.motionController;
+      let states = {};
+      for(let d = 0; d < motionController.data.length; d++) {
+        const id = sanitizedID(motionController.data[d].id, motionController.xrInputSource.handedness);
+        states[id] = motionController.data[d];
+      }
+
+      const keys = Object.keys(this.controllerEvents);
+      for(let ck = 0; ck < keys.length; ck++) {
+        const { modifiers, callback, cooldown, activeCooldown, instantReset } = this.controllerEvents[keys[ck]];
+        let toBeExecuted = true;
+        for(let m = 0; m < modifiers.length; m++) {
+          if(states[modifiers[m].id] == null || (modifiers[m].isStateModifier == true && (states[modifiers[m].id].state == null || states[modifiers[m].id].state != modifiers[m].state)) || (modifiers[m].isXAxisModifier && (states[modifiers[m].id].xAxis == null || Math.abs(states[modifiers[m].id].xAxis) < modifiers[m].xAxis)) ||
+          (modifiers[m].isYAxisModifier && (states[modifiers[m].id].yAxis == null || Math.abs(states[modifiers[m].id].yAxis) < modifiers[m].yAxis))) {
+            toBeExecuted = false;
+            break;
+          }
+        }
+
+        if(toBeExecuted) {
+          if(activeCooldown < (time - cooldown)) {
+            callback(ctx, states, c);
+            this.controllerEvents[keys[ck]].activeCooldown = time;
+          }
+        } else if(instantReset) {
+          this.controllerEvents[keys[ck]].activeCooldown = 0;
+        }
+      }
+
       if (intersections.length > 0) {
         intersections.sort((a, b) => {
           return a[1].distance - b[1].distance

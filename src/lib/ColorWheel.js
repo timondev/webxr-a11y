@@ -75,7 +75,7 @@ class ColorWheel {
     //this.ui.rotation.x = -Math.PI / 3;
     this.ui.position.y = 0.1;
 
-    controller.add(this.ui);
+    ctx.raycontrol.addAttachement("sprayCan", controller, this.ui);
 
     ctx.raycontrol.addState("colorwheel", {
       colliderMesh: this.ui,

@@ -205,6 +205,46 @@
       #no-webxr a {
         color: #000;
       }
+
+      #aria-output {
+        position: fixed;
+        left: 0; top: 0;
+        width: 50vw;
+        z-index: 99;
+        color: #fff;
+        background-color: rgba(0, 0, 0, 0.78)   ;
+      }
+
+      .a11y-point {
+        display: flex;
+        flex-wrap: nowrap;
+        flex-direction: row;
+        justify-content: center;
+        white-space: nowrap;
+        position: fixed;
+        width: 4px; height: 4px;
+        background-color: red;
+        border-radius: 50%;
+        z-index: 99;
+      }
+
+      .xr-button {
+        position: absolute;
+        left: 50%; bottom: 20px;
+        transform: translateX(-50%);
+        padding: 16px 36px;
+        border: 1px solid transparent;
+        border-radius: 4px;
+        background: rgba(0,0,0,0.78);
+        color: #fff;
+        font: normal 16px sans-serif;
+        text-align: center;
+        z-index: 999;
+      }
+
+      .xr-button:active {
+        border: 1px solid #fff;
+      }
     </style>
     <script defer type="module" src="./src/index.js"></script>
     <script type="text/javascript">
@@ -220,9 +260,10 @@
     </script>
   </head>
   <body>
+    <div id="aria-output" aria-atomic="true" aria-live="assertive"></div>
+    <div id="a11y-points"></div>
     <div id="loading">
       <div>
-        <h1>Hello! Currently loading Assets and Data</h1>
         <svg
           xmlns="http://www.w3.org/2000/svg"
           width="100"
@@ -250,12 +291,11 @@
     <header>
       <span id="handedness">
         Handedness:
-        <a href="#" id="lefthand" onclick="setHandedness(this, 'left')">Left</a>
-        <a href="#" id="righthand" onclick="setHandedness(this, 'right')"
-          >Right</a
+        <a href="#" id="lefthand" tabindex="2" onclick="setHandedness(this, 'left')">Links</a>
+        <a href="#" id="righthand" tabindex="3" onclick="setHandedness(this, 'right')"
+          >Rechts</a
         >
       </span>
     </header>
-    <footer></footer>
   </body>
 </html>

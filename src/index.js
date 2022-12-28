@@ -5,6 +5,10 @@ import { VRButton } from "./lib/VRButton.js";
 import { slideshow } from "./lib/slideshow.js";
 import { loadAsset, loadAssets } from "./lib/assetManager.js";
 
+import { cameraDistanceTo, mobileAndTabletCheck } from "./lib/utils.js";
+// import { angleToClock, readSurroundings, requestText, speak } from './lib/a11y.js'
+import { convertAngleToClock, getElementDefinition, getElementName, getElementPath, getNextKeyInObject, isElementChild, speak, translate, updateElementList } from "./lib/accessibility.js";
+
 // ECSY
 import { World } from "ecsy";
 import { SDFTextSystem } from "./systems/SDFTextSystem.js";
@@ -18,6 +22,8 @@ import { BillboardSystem } from "./systems/BillboardSystem.js";
 import { SystemsGroup } from "./systems/SystemsGroup.js";
 
 import assets from "./assets.js";
+
+import i18next from "i18next";
 
 import {
   Object3D,
@@ -54,10 +60,8 @@ import { shaders } from "./lib/shaders.js";
 
 import WebXRPolyfill from "webxr-polyfill";
 import { detectWebXR } from "./lib/utils.js";
-import { fetchProfile } from "@webxr-input-profiles/motion-controllers";
+import { Constants, fetchProfile } from "@webxr-input-profiles/motion-controllers";
 const polyfill = new WebXRPolyfill();
-
-const DEBUG = true;
 
 let clock = new THREE.Clock();
 
@@ -122,6 +126,10 @@ const handedness = urlObject.searchParams.has("handedness")
   ? urlObject.searchParams.get("handedness")
   : "right";
 
+const defaultLanguage = urlObject.searchParams.has("language")
+  ? urlObject.searchParams.get("language")
+  : "de";
+
 // Target positions when moving from one room to another
 const targetPositions = {
   hall: {
@@ -139,6 +147,25 @@ const targetPositions = {
     hall: new THREE.Vector3(-1.8, 0, -5),
   },
 };
+
+const centerVec = new THREE.Vector3(0, 0, 0);
+const upVec = new THREE.Vector3(0, 1, 0);
+
+import en from './locales/en';
+import de from './locales/de_new';
+import { Vector3 } from "three";
+
+i18next.init({
+  lng: defaultLanguage,
+  resources: {
+    en: {
+      translation: en,
+    },
+    de: {
+      translation: de,
+    },
+  }
+})
 
 const gotoRoom = (room) =>  {
   rooms[context.room].exit(context);
@@ -299,6 +326,13 @@ const init = () =>  {
   context.world = ecsyWorld;
   context.systemsGroup = systemsGroup;
   context.handedness = handedness;
+  context.language = defaultLanguage;
+
+  context.elements = [];
+  context.currentElement = '';
+
+  context.debugMode = !mobileAndTabletCheck();
+  context.deltaTime = 0.0;
 
   window.context = context;
 
@@ -309,8 +343,11 @@ const init = () =>  {
     "assets/",
     assets,
     () => {
+      speak('intro');
+
       raycontrol = new RayControl(context, handedness);
       context.raycontrol = raycontrol;
+      setupRayControl();
 
       teleport = new Teleport(context);
       context.teleport = teleport;
@@ -335,9 +372,20 @@ const init = () =>  {
             gotoRoom(0);
             context.cameraRig.position.set(0, 0, 2);
             context.goto = null;
+
+            window.setTimeout(() => {
+              speak('enter_vr');
+              window.setTimeout(() => { speak('enter_vr_2') }, 1000);
+              window.setTimeout(() => { speak('enter_vr_3') }, 3000);
+              window.setTimeout(() => { speak('enter_vr_4') }, 5000);
+            }, 1000);
           } else {
             slideshow.setup(context);
+
+            speak('exit_vr');
           }
+        }, () => {
+          rooms[context.room].exit(context);
         })
       );
       renderer.setAnimationLoop(animate);
@@ -365,14 +413,247 @@ const setupControllers = async (renderer) =>  {
     controller.addEventListener("connected", async (event) => {
       const { profile, assetPath } = await fetchProfile(event.data, '/profiles')
       const asset = await loadAsset(renderer, { url: assetPath })
-      controller.add(asset.scene.clone());
-      raycontrol.addController(controller, event.data);
+      raycontrol.addController(controller, event.data, { profile, assetPath, asset });
+      speak('controller_connected');
     });
     controller.addEventListener("disconnect", async () => {
       controller.remove(controller.children[0]);
       raycontrol.removeController(controller, event.data);
+      speak('controller_disconnected');
     });
   }
+}
+
+const setupRayControl = () => {
+  raycontrol.addControllerEventListener(
+    'selectNext',
+    [
+      { id: 'right-a', isStateModifier: true, state: Constants.ComponentState.PRESSED },
+      { id: 'right-squeeze', isStateModifier: true, state: Constants.ComponentState.DEFAULT },
+    ],
+    0.5,
+    false,
+    (ctx, states) => {
+      if(ctx.elements.length == 0) {
+        return speak('no_objects_available');
+      }
+
+      if(ctx.currentElement != '') {
+        let elementName = getElementName(ctx.currentElement);
+
+        if(isElementChild(ctx.currentElement)) {
+          let parent = getElementDefinition(getElementPath(ctx.currentElement));
+          ctx.currentElement = getElementPath(ctx.currentElement) + '.' + getNextKeyInObject(parent.children, elementName);
+          speak(getElementDefinition(ctx.currentElement).name);
+          return;
+        }
+
+        console.log(ctx.currentElement, ctx.elements.indexOf(elementName), ctx.elements);
+        let index = ctx.elements.indexOf(elementName);
+        ctx.currentElement = ctx.elements[(index != -1 && index < ctx.elements.length - 1) ? index + 1 : 0];
+        speak(getElementDefinition(ctx.currentElement).name);
+        return;
+      }
+
+      ctx.currentElement = ctx.elements[0];
+      speak(getElementDefinition(ctx.currentElement).name);
+    }
+  )
+  raycontrol.addControllerEventListener(
+    'getDescription',
+    [
+      { id: 'right-b', isStateModifier: true, state: Constants.ComponentState.PRESSED },
+      { id: 'right-squeeze', isStateModifier: true, state: Constants.ComponentState.DEFAULT },
+    ],
+    1.0,
+    false,
+    (ctx, states) => {
+      if(ctx.elements.length == 0) {
+        return speak('no_objects_available');
+      }
+
+      if(ctx.currentElement != '') {
+        let definition = getElementDefinition(ctx.currentElement);
+        return speak(definition.description);
+      }
+
+      return speak('no_element_selected');
+    }
+  )
+  raycontrol.addControllerEventListener(
+    'changeLevel',
+    [
+      { id: 'right-a', isStateModifier: true, state: Constants.ComponentState.PRESSED },
+      { id: 'right-squeeze', isStateModifier: true, state: Constants.ComponentState.PRESSED },
+    ],
+    1.0,
+    false,
+    (ctx, states) => {
+      if(ctx.elements.length == 0) {
+        ctx.currentElement = '';
+        return speak('lost_focus');
+      }
+
+      if(isElementChild(ctx.currentElement)) {
+        ctx.currentElement = getElementPath(ctx.currentElement);
+        speak(getElementDefinition(ctx.currentElement).name);
+        return;
+      }
+
+      let parent = getElementDefinition(ctx.currentElement);
+
+      if(parent.children != null) {
+        ctx.currentElement += '.' + getNextKeyInObject(parent.children, '');
+        speak(getElementDefinition(ctx.currentElement).name);
+        return;
+      }
+
+      speak('no_children');
+    }
+  )
+  raycontrol.addControllerEventListener(
+    'debug',
+    [
+      { id: 'left-squeeze', isStateModifier: true, state: Constants.ComponentState.DEFAULT },
+      { id: 'left-thumbstick', isStateModifier: true, state: Constants.ComponentState.PRESSED }
+    ],
+    0.2,
+    false,
+    (ctx, states) => {
+      // console.log('camera-positon', ctx.renderer.xr.getCamera(ctx.camera).position);
+      // console.log('camera-rotation', ctx.camera.rotation);
+      ctx.scene.traverseVisible((element) => {
+        if(element.name != '') console.log(element.name);
+      });
+    }
+  )
+  raycontrol.addControllerEventListener(
+    'teleport',
+    [
+      { id: 'right-squeeze', isStateModifier: true, state: Constants.ComponentState.PRESSED },
+      { id: 'right-thumbstick', isStateModifier: true, state: Constants.ComponentState.PRESSED }
+    ],
+    0.2,
+    false,
+    (ctx, states) => {
+      if(ctx.currentElement != null) {
+        let definition = getElementDefinition(ctx.currentElement);
+        if(definition != null && definition.teleportation != null) {
+          const { position, rotation } = definition.teleportation;
+          const camera = ctx.renderer.xr.getCamera(ctx.camera);
+    
+          ctx.cameraRig.position.sub(new THREE.Vector3(camera.position.x - position.x, 0.0, camera.position.z - position.z));
+
+          // camera.lookAt(rotation);
+          speak('teleport', { object: translate(definition.name) });
+        } else {
+          speak('no_teleport');
+        }
+      }
+    }
+  )
+  raycontrol.addControllerEventListener(
+    'interactLeft',
+    [
+      { id: 'left-squeeze', isStateModifier: true, state: Constants.ComponentState.PRESSED },
+      { id: 'left-y', isStateModifier: true, state: Constants.ComponentState.PRESSED },
+    ],
+    0.5,
+    false,
+    (ctx, states, controllerIndex) => {
+      if(ctx.elements.length == 0) {
+        return speak('no_objects_available');
+      }
+      
+      if(ctx.currentElement != '') {
+        let definition = getElementDefinition(ctx.currentElement);
+        if(definition != null && definition.interaction != null && definition.interaction.event != null) {
+          let controller = ctx.renderer.xr.getController(controllerIndex);
+          return definition.interaction.event(ctx, controller, 'left');
+        } else {
+          return speak('no_interaction_available');
+        }
+      }
+
+      return speak('no_element_selected');
+    }
+  )
+  raycontrol.addControllerEventListener(
+    'interactRight',
+    [
+      { id: 'right-squeeze', isStateModifier: true, state: Constants.ComponentState.PRESSED },
+      { id: 'right-b', isStateModifier: true, state: Constants.ComponentState.PRESSED },
+    ],
+    0.5,
+    false,
+    (ctx, states, controllerIndex) => {
+      if(ctx.elements.length == 0) {
+        return speak('no_objects_available');
+      }
+      
+      if(ctx.currentElement != '') {
+        let definition = getElementDefinition(ctx.currentElement);
+        if(definition != null && definition.interaction != null && definition.interaction.event != null) {
+          let controller = ctx.renderer.xr.getController(controllerIndex);
+          return definition.interaction.event(ctx, controller, 'right');
+        } else {
+          return speak('no_interaction_available');
+        }
+      }
+
+      return speak('no_element_selected');
+    }
+  )
+  raycontrol.addControllerEventListener(
+    'navigation',
+    [
+      { id: 'right-squeeze', isStateModifier: true, state: Constants.ComponentState.DEFAULT },
+      { id: 'right-thumbstick', isStateModifier: true, state: Constants.ComponentState.PRESSED }
+    ],
+    0.2,
+    false,
+    (ctx, states) => {
+      if(ctx.elements.length == 0) {
+        return speak('no_objects_available');
+      }
+
+      if(ctx.currentElement == '') return speak('no_element_selected');
+      let elementName = getElementName(ctx.currentElement);
+      let object = ctx.scene.getObjectByName(elementName);
+
+      if(object == null) {
+        let definition = getElementDefinition(ctx.currentElement);
+
+        if(definition == null || definition.position == null) return speak('no_element_selected');
+
+        object = definition;
+      }
+
+      let position = object.position;
+      const cameraPosition = ctx.camera.position;
+
+      let vector = new THREE.Vector3();
+      ctx.camera.getWorldDirection(vector);
+
+      // camera -> object
+      const u = new THREE.Vector2(position.x - cameraPosition.x, -1 * (position.z - cameraPosition.z)); 
+      u.normalize();
+
+      // camera -> view
+      const v = new THREE.Vector3(1, 1, -1); 
+      v.multiply(vector);
+
+      let angle = Math.atan2(u.x * v.z - u.y * v.x, u.x * v.x + u.y * v.z) * 180 / Math.PI;
+      if(angle < 0) angle += 360.0;
+
+      let objectDistancePositon = new THREE.Vector3();
+      (object.room == null) ? object.getWorldPosition(objectDistancePositon) : objectDistancePositon.copy(position);
+
+      const distance = cameraDistanceTo(ctx, objectDistancePositon);
+
+      speak('navigation_text', { x: translate('clock', { clock: convertAngleToClock(angle) }), y: distance.toFixed(1) });
+    }
+  )
 }
 
 // @FIXME Hack for Oculus Browser issue
@@ -396,8 +677,8 @@ const onSelectStart = (ev) =>  {
   }
   // <@FIXME
 
-  const trigger = ev.target.getObjectByName("trigger");
-  trigger.rotation.x = -0.3;
+//  const trigger = ev.target.getObjectByName("trigger");
+//  trigger.rotation.x = -0.3;
   raycontrol.onSelectStart(ev);
 }
 
@@ -413,8 +694,8 @@ const onSelectEnd = (ev) =>  {
   }
   // <@FIXME
 
-  const trigger = ev.target.getObjectByName("trigger");
-  trigger.rotation.x = 0;
+//  const trigger = ev.target.getObjectByName("trigger");
+//  trigger.rotation.x = 0;
   raycontrol.onSelectEnd(ev);
 }
 
@@ -423,7 +704,7 @@ const onWindowResize = () =>  {
   camera.updateProjectionMatrix();
   renderer.setSize(window.innerWidth, window.innerHeight);
 
-  if (DEBUG) {
+  if (context.debugMode) {
     spectator.aspect = window.innerWidth / window.innerHeight;
     spectator.updateProjectionMatrix();
   }
@@ -456,7 +737,8 @@ const animate = () =>  {
     context.goto = null;
   }
 
-  if (DEBUG && renderer.xr.isPresenting) {
+  updateElementList(context);
+  if (context.debugMode && renderer.xr.isPresenting) {
     const xrCamera = renderer.xr.getCamera(camera)
 
     spectator.projectionMatrix.copy(camera.projectionMatrix);

@@ -28,6 +28,7 @@ const enter = (ctx) =>  {
   ctx.scene.add(panoL);
   ctx.scene.add(panoR);
   ctx.camera.layers.enable(1);
+  ctx.spectator.layers.enable(1);
   context = ctx;
 
   ctx.raycontrol.activateState("panoramaStereo");
@@ -37,6 +38,7 @@ const exit = (ctx) =>  {
   ctx.scene.remove(panoL);
   ctx.scene.remove(panoR);
   ctx.camera.layers.disable(1);
+  ctx.spectator.layers.disable(1);
   ctx.raycontrol.deactivateState("panoramaStereo");
 }
 

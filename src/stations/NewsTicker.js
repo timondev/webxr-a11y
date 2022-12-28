@@ -66,16 +66,17 @@ const setup = (ctx, hall) =>  {
     .then((res) => res.json())
     .then((res) => {
       newsTicker.news = res;
-      nextNews();
+      nextNews(ctx);
     });
 }
 
-const nextNews = () =>  {
+const nextNews = (ctx) =>  {
   const n = newsTicker;
   n.authorText.getMutableComponent(Text).text = n.news[n.current].author;
   n.messageText.getMutableComponent(Text).text = n.news[n.current].message;
   n.current = (n.current + 1) % n.news.length;
-  setTimeout(nextNews, 3000);
+  ctx.currentNews = n.news[n.current];
+  setTimeout(() => { nextNews(ctx) }, 15000);
 }
 
 const execute = (ctx, delta, time) =>  {
@@ -83,4 +84,4 @@ const execute = (ctx, delta, time) =>  {
   screenMaterial.color.setRGB(v, v, v);
 }
 
-export { setup, execute };
+export { setup, execute, getCurrentNews };

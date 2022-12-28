@@ -166,25 +166,39 @@ const onSelectStart = (evt) =>  {
   for (let i = 0; i < 2; i++) {
     bbox.setFromObject(xyloSticks[i]);
     if (controller.boundingBox.intersectsBox(bbox)){
-
-      setStickColor(i, 0xaaaaaa);
-
-      _ctx.raycontrol.disable();
-
-      // stick grabbed from the other hand
-      if (xyloSticks[i].userData.grabbedBy) {
-        xyloSticks[i].userData.grabbedBy.userData.grabbing = null;
-      }
-      xyloSticks[i].position.set(0, 0, 0);
-      xyloSticks[i].rotation.set(0, 0, 0);
-      controller.add(xyloSticks[i]);
-      xyloSticks[i].userData.animation = 0;
-      controller.userData.grabbing = xyloSticks[i];
-      xyloSticks[i].userData.grabbedBy = controller;
+      activateStick(_ctx, i, controller);
       return false;
     }
   }
   return true;
+}
+
+const activateStick = (ctx, i, controller) => {
+  setStickColor(i, 0xaaaaaa);
+
+  ctx.raycontrol.disable();
+
+  // stick grabbed from the other hand
+  if (xyloSticks[i].userData.grabbedBy) {
+    xyloSticks[i].userData.grabbedBy.userData.grabbing = null;
+  }
+  xyloSticks[i].position.set(0, 0, 0);
+  xyloSticks[i].rotation.set(0, 0, 0);
+  controller.add(xyloSticks[i]);
+  xyloSticks[i].userData.animation = 0;
+  controller.userData.grabbing = xyloSticks[i];
+  xyloSticks[i].userData.grabbedBy = controller;
+}
+
+const deactivateStick = (controller) => {
+  let stick = controller.userData.grabbing;
+  stick.getWorldPosition(auxVec);
+  hallRef.add(stick);
+  stick.position.copy(auxVec);
+  stick.rotation.copy(stick.userData.resetRotation);
+  stick.userData.grabbedBy = null;
+  stick.userData.animation = 1;
+  controller.userData.grabbing = null;
 }
 
 const onSelectEnd = (evt) =>  {
@@ -192,17 +206,10 @@ const onSelectEnd = (evt) =>  {
 
   let controller = evt.target;
   if (controller.userData.grabbing !== null) {
-    let stick = controller.userData.grabbing;
-    stick.getWorldPosition(auxVec);
-    hallRef.add(stick);
-    stick.position.copy(auxVec);
-    stick.rotation.copy(stick.userData.resetRotation);
-    stick.userData.grabbedBy = null;
-    stick.userData.animation = 1;
-    controller.userData.grabbing = null;
+    deactivateStick(controller);
     return false;
   }
   return true;
 }
 
-export { setup, enter, exit, execute, onSelectStart, onSelectEnd };
+export { setup, enter, exit, execute, onSelectStart, onSelectEnd, activateStick, deactivateStick };
